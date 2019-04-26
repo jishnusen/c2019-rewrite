@@ -49,7 +49,6 @@ def includeDesktopSupport = false
 // Maven central needed for JUnit
 repositories {
     mavenCentral()
-    maven {url "http://devsite.ctr-electronics.com/maven/release/"}
 }
 
 ext.PhoenixVersion = "5.14.1"
@@ -62,9 +61,6 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
-    compile "com.ctre.phoenix:api-java:${PhoenixVersion}"
-    compile "com.ctre.phoenix:wpiapi-java:${PhoenixVersion}"
-    nativeZip "com.ctre.phoenix:cci:${PhoenixVersion}:linuxathena@zip"
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
     testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.2')
     testRuntime('org.junit.jupiter:junit-jupiter-engine:5.4.2')
