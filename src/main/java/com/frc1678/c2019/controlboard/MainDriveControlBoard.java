@@ -33,6 +33,6 @@ public class MainDriveControlBoard implements IDriveControlBoard {
 
     @Override
     public boolean getQuickTurn() {
-        return mTurnStick.getRawButton(1);
+        return mTurnStick.getRawButton(5);
     }
 }

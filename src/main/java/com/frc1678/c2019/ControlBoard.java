@@ -13,10 +13,11 @@ public class ControlBoard implements IControlBoard {
     }
 
     private IDriveControlBoard mDriveControlBoard;
-//    private IButtonControlBoard mButtonControlBoard;
+    private IButtonControlBoard mButtonControlBoard;
 
     private ControlBoard() {
         mDriveControlBoard = MainDriveControlBoard.getInstance();
+        mButtonControlBoard = GamepadButtonControlBoard.getInstance();
     }
 
     @Override
@@ -32,6 +33,75 @@ public class ControlBoard implements IControlBoard {
     @Override
     public boolean getQuickTurn() {
         return mDriveControlBoard.getQuickTurn();
+    }
+
+    @Override
+    public boolean goToGround() {
+        return mButtonControlBoard.goToGround();
+    }
+
+    @Override
+    public boolean goToStow() {
+        return mButtonControlBoard.goToStow();
+    }
+
+    @Override
+    public boolean goToFirstLevel() {
+        return mButtonControlBoard.goToFirstLevel();
+    }
+
+    @Override
+    public boolean goToSecondLevel() {
+        return mButtonControlBoard.goToSecondLevel();
+    }
+
+    @Override
+    public boolean goToThirdLevel() {
+        return mButtonControlBoard.goToThirdLevel();
+    }
+    
+    @Override
+    public boolean goToFirstLevelBackwards() {
+        return mButtonControlBoard.goToFirstLevelBackwards();
+    }
+
+    @Override
+    public boolean goToShip() {
+        return mButtonControlBoard.goToShip();
+    }
+
+    // Elevator
+    @Override
+    public double getJogElevatorThrottle() {
+        return mButtonControlBoard.getJogElevatorThrottle();
+    }
+
+    // Wrist
+    @Override
+    public double getJogWristThrottle() {
+        return mButtonControlBoard.getJogWristThrottle();
+    }
+
+    // Cargo Intake
+    @Override
+    public boolean getRunIntake() {
+        return mButtonControlBoard.getRunIntake();
+    }
+    
+    @Override
+    public boolean getRunOuttake() {
+        return mButtonControlBoard.getRunOuttake();
+    }
+
+    // Hatch Intake
+    @Override
+    public boolean getScoreHatch() {
+        return mButtonControlBoard.getScoreHatch();
+    }
+
+    @Override
+    public void setRumble(boolean on) {
+        mButtonControlBoard.setRumble(on);
     }
 }
 
