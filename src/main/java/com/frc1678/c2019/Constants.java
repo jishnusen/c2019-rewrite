@@ -43,6 +43,47 @@ public class Constants {
     public static final int kDriveVelocityIZone = 0;
     public static final double kDriveVoltageRampRate = 0.0;
 
+    // PID gains for elevator velocity loop (HIGH GEAR)
+    // Units: setpoint, error, and output are in native units per 100ms.
+    // Elevator encoder is CTRE mag encoder which is 4096 native units per revolution.
+    public static final double kElevatorHighGearKp =  0.12;
+    public static final double kElevatorHighGearKi = 0.0;//0.0;
+    public static final double kElevatorHighGearKd = 4.0;
+    public static final double kElevatorHighGearKf = 0.06; // lower speed:  0.08;
+    public static final double kElevatorJogKp =  0.1;
+    public static final double kElevatorJogKd =  3.0;
+    public static final double kElevatorFeedforwardNoCube = 1.3 / 12;
+    public static final double kElevatorFeedforwardWithCube = 1.3 / 12;
+
+    public static final int kElevatorHighGearMaxIntegralAccumulator = 500000; //todo: tune me
+    public static final int kElevatorHighGearIZone = 0;
+    public static final int kElevatorHighGearDeadband = 0;
+    public static final int kElevatorHighGearCruiseVelocity = 14325;
+    public static final int kElevatorHighGearAcceleration = 19100;
+    public static final double kElevatorEpsilon = 1.0;
+    public static final double kElevatorRampRate = 0.1;
+
+    // PID gains for wrist velocity loop
+    public static final double kWristKp = 1.0;
+    public static final double kWristKi = 0.0;
+    public static final double kWristKd = 20.0;
+    public static final double kWristKf = 0.3;
+    public static final double kWristJogKp = 2.0;
+    public static final double kWristJogKd = 40.0;
+    public static final double kWristKaWithCube = 0.006;
+    public static final double kWristKaWithoutCube = 0.003;
+    public static final double kWristKfMultiplierEmpty = 0.1275;
+    public static final double kWristElevatorAccelerationMultiplier = -1.0;
+    public static final double kWristEpsilon = 2.0;
+
+    public static final int kWristMaxIntegralAccumulator = 500000; //todo: tune me
+    public static final int kWristIZone = 500; //todo: tune me
+    public static final int kWristDeadband = 5; //todo: tune me
+    public static final int kWristCruiseVelocity = 2500; //todo: tune me
+    public static final int kWristAcceleration = 2500; //2000 //todo: tune me
+    public static final double kWristRampRate = 0.001;
+    public static final double kAutoWristRampRate = 0.01;
+
     /* I/O */
     // (Note that if multiple talons are dedicated to a mechanism, any sensors
     // are attached to the master)
@@ -53,12 +94,33 @@ public class Constants {
     public static final int kCameraStreamPort = 5810;
 
     // Drive
-    public static final int kLeftDriveMasterId = 5;
-    public static final int kLeftDriveSlaveAId = 6;
-    public static final int kLeftDriveSlaveBId = 7;
+    public static final int kLeftDriveMasterId = 1;
+    public static final int kLeftDriveSlaveAId = 2;
+    public static final int kLeftDriveSlaveBId = 3;
     public static final int kRightDriveMasterId = 12;
-    public static final int kRightDriveSlaveAId = 13;
-    public static final int kRightDriveSlaveBId = 14;
+    public static final int kRightDriveSlaveAId = 11;
+    public static final int kRightDriveSlaveBId = 10;
+
+    // Intakes
+    public static final int kCanifierId = 0;
+
+    // Elevator
+    public static final int kElevatorMasterId = 6;
+    public static final int kElevatorRightSlaveId = 7;
+    public static final int kElevatorLeftSlaveAId = 8;
+    public static final int kElevatorLeftSlaveBId = 9;
+
+    // Wrist
+    public static final int kWristMasterId = 14;
+
+    // Cargo Intake
+    public static final int kCargoIntakeRollerId = 4;
+
+    // Solenoids
+    public static final int kElevatorShifterSolenoidId = 0;
+    public static final int kBackplateSolenoidId = 2;
+    public static final int kArrowheadSolenoidId = 3;
+    public static final int kCargoIntakePopoutSolenoidId = 6;
     
     // Control Board
     public static final boolean kUseGamepadForDriving = false;
@@ -68,5 +130,46 @@ public class Constants {
     public static final int kButtonGamepadPort = 2;
     public static final int kMainThrottleJoystickPort = 0;
     public static final int kMainTurnJoystickPort = 1;
-    
+    public static final double kJoystickThreshold = 0.5;
+    public static final double kJoystickJogThreshold = 0.4;
+
+
+    public static Solenoid makeSolenoidForId(int solenoidId) {
+        if (solenoidId < 8) {
+            return new Solenoid(solenoidId);
+        }
+        throw new IllegalArgumentException("Solenoid ID not valid: " + solenoidId);
+    }
+
+    /**
+     * @return the MAC address of the robot
+     */
+    public static String getMACAddress() {
+        try {
+            Enumeration<NetworkInterface> nwInterface = NetworkInterface.getNetworkInterfaces();
+            StringBuilder ret = new StringBuilder();
+            while (nwInterface.hasMoreElements()) {
+                NetworkInterface nis = nwInterface.nextElement();
+                if (nis != null) {
+                    byte[] mac = nis.getHardwareAddress();
+                    if (mac != null) {
+                        for (int i = 0; i < mac.length; i++) {
+                            ret.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                        }
+                        return ret.toString();
+                    } else {
+                        System.out.println("Address doesn't exist or is not accessible");
+                    }
+                } else {
+                    System.out.println("Network Interface for the specified address is not found.");
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }
