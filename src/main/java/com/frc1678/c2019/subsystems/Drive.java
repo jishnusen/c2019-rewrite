@@ -121,7 +121,7 @@ public class Drive extends Subsystem {
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(mLeftSlaveB);
+        mPigeon = new PigeonIMU(mLeftSlaveA);
         mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
