@@ -10,8 +10,6 @@ import com.team254.lib.geometry.Twist2d;
  */
 
 public class Kinematics {
-    private static final double kEpsilon = 1E-9;
-
     /**
      * Forward kinematics using only encoders, rotation is implicit (less accurate than below, but useful for predicting
      * motion)

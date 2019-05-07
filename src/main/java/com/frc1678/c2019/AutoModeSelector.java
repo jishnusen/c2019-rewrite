@@ -4,7 +4,6 @@ import com.frc1678.c2019.auto.AutoModeBase;
 import com.frc1678.c2019.auto.creators.AutoModeCreator;
 import com.frc1678.c2019.auto.creators.CharacterizeHighGearStraightCreator;
 import com.frc1678.c2019.auto.creators.CrossAutoLineCreator;
-import com.frc1678.c2019.auto.modes.CharacterizeHighGearStraight;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,13 +32,13 @@ public class AutoModeSelector {
 
     public AutoModeSelector() {
         mModeChooser = new SendableChooser<>();
-        mModeChooser.addDefault("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
-        mModeChooser.addObject("Do Nothing", DesiredMode.DO_NOTHING);
+        mModeChooser.setDefaultOption("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
+        mModeChooser.addOption("Do Nothing", DesiredMode.DO_NOTHING);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
-        mStartPositionChooser.addDefault("Right", StartingPosition.RIGHT);
-        mStartPositionChooser.addObject("Left", StartingPosition.LEFT);
+        mStartPositionChooser.setDefaultOption("Right", StartingPosition.RIGHT);
+        mStartPositionChooser.addOption("Left", StartingPosition.LEFT);
         SmartDashboard.putData("Starting Position", mStartPositionChooser);
     }
 

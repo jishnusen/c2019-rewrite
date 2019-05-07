@@ -4,7 +4,6 @@ import com.frc1678.c2019.auto.AutoModeBase;
 import com.frc1678.c2019.auto.AutoModeEndedException;
 import com.frc1678.c2019.auto.actions.*;
 import com.frc1678.c2019.paths.TrajectoryGenerator;
-import com.frc1678.c2019.subsystems.Drive;
 
 public class CrossAutoLineMode extends AutoModeBase {
     private static final TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();

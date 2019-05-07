@@ -21,13 +21,7 @@ public class TrajectoryGenerator {
     private static final double kMaxCentripetalAccelElevatorDown = 110.0;
     private static final double kMaxCentripetalAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
-    private static final double kFirstPathMaxVoltage = 9.0;
-    private static final double kFirstPathMaxAccel = 130.0;
-    private static final double kFirstPathMaxVel = 130.0;
 
-    private static final double kSimpleSwitchMaxAccel = 100.0;
-    private static final double kSimpleSwitchMaxCentripetalAccel = 80.0;
-    private static final double kSimpleSwitchMaxVelocity = 120.0;
 
     private static TrajectoryGenerator mInstance = new TrajectoryGenerator();
     private final DriveMotionPlanner mMotionPlanner;
@@ -108,7 +102,7 @@ public class TrajectoryGenerator {
             waypoints.add(kSideStartPose);
             waypoints.add(kSideStartPose.transformBy(Pose2d.fromTranslation(new Translation2d(-36.0, 0.0))));
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccelElevatorDown)),
-                    kFirstPathMaxVel, kFirstPathMaxAccel, kFirstPathMaxVoltage);
+                    kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
     }
 }

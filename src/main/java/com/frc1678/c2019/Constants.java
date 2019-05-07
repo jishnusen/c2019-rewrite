@@ -1,6 +1,5 @@
 package com.frc1678.c2019;
 
-import com.team254.lib.util.Units;
 import edu.wpi.first.wpilibj.Solenoid;
 
 import java.net.NetworkInterface;

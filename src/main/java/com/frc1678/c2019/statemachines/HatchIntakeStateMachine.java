@@ -50,14 +50,14 @@ public class HatchIntakeStateMachine {
                     break;
                 case INTAKING:
                     currentState.backplateSolenoid = true;
-                    currentState.arrowheadSolenoid = false;
+                    currentState.arrowheadSolenoid = true;
                     if (currentState.hasHatch()) {
                         newState = SystemState.CARRYING;
                         currentState.backplateSolenoid = false;
                     }
                     break;
                 case CARRYING:
-                    currentState.backplateSolenoid = true;
+                    currentState.backplateSolenoid = false;
                     currentState.arrowheadSolenoid = true;
                     break;
                 case OUTTAKING:
@@ -91,11 +91,15 @@ public class HatchIntakeStateMachine {
             } else {
                 mLastSeenHatch.update(currentState.hasHatch(), kLostHatchTime);
             }
+
+            handleTransitions(wantedAction);
         }
 
-        handleTransitions(wantedAction);
-
         return currentState;
+    }
+
+    public SystemState getCurrentState() {
+        return mSystemState;
     }
 
     private void handleTransitions(WantedAction wantedAction) {
