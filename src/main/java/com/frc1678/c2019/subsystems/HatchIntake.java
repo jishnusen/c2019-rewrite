@@ -4,6 +4,7 @@ import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.statemachines.HatchIntakeStateMachine;
+import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
 import com.frc1678.c2019.states.HatchIntakeState;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -78,7 +79,10 @@ public class HatchIntake extends Subsystem {
 
     private synchronized void updateActuatorFromState(HatchIntakeState state) {
         mArrowheadSolenoid.set(state.arrowheadSolenoid);
-        mBackplateSolenoid.set(state.backplateSolenoid);
+        if (mWantedAction != WantedAction.NONE) {
+            CargoIntake.getInstance().forceIntakeIn();
+        }
+        mBackplateSolenoid.set(Wrist.getInstance().getWantsPassThrough() ? false : (mWantedAction == WantedAction.NONE && CargoIntake.getInstance().getIntakeOut() ? false : state.backplateSolenoid));
     }
 
     public synchronized boolean hasHatch() {

@@ -23,16 +23,12 @@ public class CargoIntake extends Subsystem {
 
     private static CargoIntake mInstance;
 
-    private enum WantedAction {
-        NONE,
-        INTAKE,
-        OUTTAKE,
+    public enum WantedAction {
+        NONE, INTAKE, OUTTAKE,
     }
 
     private enum State {
-        INTAKING,
-        OUTTAKING,
-        HOLDING,
+        INTAKING, OUTTAKING, HOLDING,
     }
 
     private State mState = State.HOLDING;
@@ -111,37 +107,44 @@ public class CargoIntake extends Subsystem {
     }
 
     public synchronized boolean getIntakeOut() {
-        return mPopoutSolenoid.get();
+        return mPopoutSolenoid.get()
+         && mPeriodicIO.pop_out_solenoid; // Cut latency on the hatch intake
     }
 
     public void runStateMachine(boolean modifyOutputs) {
         switch (mState) {
-            case INTAKING:
-                if (modifyOutputs) {
-                    mPeriodicIO.demand = kIntakeVoltage;
-                    mPeriodicIO.pop_out_solenoid = true;
-                }
+        case INTAKING:
+            if (modifyOutputs) {
+                mPeriodicIO.demand = kIntakeVoltage;
+                mPeriodicIO.pop_out_solenoid = true;
+            }
+            if (hasCargo()) {
+                mState = State.HOLDING;
+            }
+            break;
+        case OUTTAKING:
+            if (modifyOutputs) {
+                mPeriodicIO.demand = kOuttakeVoltage;
+                mPeriodicIO.pop_out_solenoid = true;
+            } else if (hasCargo()) {
+                mState = State.HOLDING;
+            }
+            break;
+        case HOLDING:
+            if (modifyOutputs) {
+                mPeriodicIO.demand = hasCargo() ? kHoldingVoltage : 0.0;
                 if (hasCargo()) {
-                    mState = State.HOLDING;
-                }
-                break;
-            case OUTTAKING:
-                if (modifyOutputs) {
-                    mPeriodicIO.demand = kOuttakeVoltage;
-                    mPeriodicIO.pop_out_solenoid = true;
-                } else if (hasCargo()) {
-                    mState = State.HOLDING;
-                }
-                break;
-            case HOLDING:
-                if (modifyOutputs) {
-                    mPeriodicIO.demand = hasCargo() ? kHoldingVoltage : 0.0;
                     mPeriodicIO.pop_out_solenoid = false;
                 }
-                break; 
-            default:
-                System.out.println("Fell through on Cargo Intake states!");
+            }
+            break;
+        default:
+            System.out.println("Fell through on Cargo Intake states!");
         }
+    }
+
+    public void forceIntakeIn() {
+        mPeriodicIO.pop_out_solenoid = false;
     }
 
     public boolean hasCargo() {
@@ -152,7 +155,7 @@ public class CargoIntake extends Subsystem {
         mRunningManual = true;
         mPeriodicIO.demand = percentage;
     }
-    
+
     public double getVoltage() {
         return mPeriodicIO.demand;
     }
@@ -160,14 +163,15 @@ public class CargoIntake extends Subsystem {
     public void setState(WantedAction wanted_state) {
         mRunningManual = false;
         switch (wanted_state) {
-            case NONE:
-                break;
-            case INTAKE:
-                mState = State.INTAKING;
-                break;
-            case OUTTAKE:
-                mState = State.OUTTAKING;
-                break;
+        case NONE:
+            mState = State.HOLDING;
+            break;
+        case INTAKE:
+            mState = State.INTAKING;
+            break;
+        case OUTTAKE:
+            mState = State.OUTTAKING;
+            break;
         }
     }
 
@@ -181,26 +185,26 @@ public class CargoIntake extends Subsystem {
     @Override
     public synchronized void writePeriodicOutputs() {
         mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
+        if (Wrist.getInstance().getWantsPassThrough()) {
+            forceIntakeIn();
+        }
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
     }
 
-
     @Override
     public boolean checkSystem() {
-        return TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
-                    {
-                        add(new TalonSRXChecker.TalonSRXConfig("cargo intake", mMaster));
-                    }
-                }, new TalonSRXChecker.CheckerConfig() {
-                    {
-                        mCurrentFloor = 2;
-                        mCurrentEpsilon = 2.0;
-                        mRPMSupplier = null;
-                    }
-                });
+        return TalonSRXChecker.CheckTalons(this, new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+            {
+                add(new TalonSRXChecker.TalonSRXConfig("cargo intake", mMaster));
+            }
+        }, new TalonSRXChecker.CheckerConfig() {
+            {
+                mCurrentFloor = 2;
+                mCurrentEpsilon = 2.0;
+                mRPMSupplier = null;
+            }
+        });
     }
-
 
     public static class PeriodicIO {
         // INPUTS
