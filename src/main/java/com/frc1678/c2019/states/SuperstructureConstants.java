@@ -15,6 +15,14 @@ public class SuperstructureConstants {
     // Safety
     public static final double kElevatorApproachingThreshold = 1.0;
 
+    // Jog
+    // This is in inches / ~20ms
+    public final static double kElevatorJogThrottle = 60.0 / 50.0;
+
+    // This is in degrees / ~20ms
+    public final static double kWristJogThrottle = 200.0 / 25.0;
+    
+
     // elevator constants
     public static double kHatchShipForwardsHeight = 4;
     public static double kHatchShipBackwardsHeight = 5;
