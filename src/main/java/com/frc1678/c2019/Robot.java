@@ -15,21 +15,21 @@ import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
 import com.frc1678.c2019.subsystems.RobotStateEstimator;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
+import com.frc1678.c2019.statemachines.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode;
-import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
@@ -96,9 +96,19 @@ public class Robot extends IterativeRobot {
         try {
                 CrashTracker.logDisabledInit();
                 mEnabledLooper.stop();
+                if (mAutoModeExecuter != null) {
+                    mAutoModeExecuter.stop();
+                }
+                
+                mInfrastructure.setIsDuringAuto(true);
 
                 Drive.getInstance().zeroSensors();
                 RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
+
+                            // Reset all auto mode state.
+                mAutoModeSelector.reset();
+                mAutoModeSelector.updateModeCreator();
+                mAutoModeExecuter = new AutoModeExecuter();
 
                 mDisabledLooper.start();
         } catch (Throwable t) {
@@ -119,6 +129,9 @@ public class Robot extends IterativeRobot {
                 RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
                 Drive.getInstance().zeroSensors();
+                mInfrastructure.setIsDuringAuto(true);
+
+                mWrist.setRampRate(Constants.kAutoWristRampRate);
 
                 mAutoModeExecuter.start();
 
@@ -136,6 +149,12 @@ public class Robot extends IterativeRobot {
         try {
                 CrashTracker.logTeleopInit();
                 mDisabledLooper.stop();
+                if (mAutoModeExecuter != null) {
+                    mAutoModeExecuter.stop();
+                }
+
+                mInfrastructure.setIsDuringAuto(false);
+                mWrist.setRampRate(Constants.kWristRampRate);
 
                 RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
                 mEnabledLooper.start();
@@ -178,6 +197,10 @@ public class Robot extends IterativeRobot {
         try {
                 outputToSmartDashboard();
                 mElevator.resetIfAtLimit();
+                mWrist.resetIfAtLimit();
+
+                mAutoModeSelector.updateModeCreator();
+
                 Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
                 if (autoMode.isPresent() && autoMode.get() != mAutoModeExecuter.getAutoMode()) {
                         System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
@@ -216,42 +239,82 @@ public class Robot extends IterativeRobot {
             outputToSmartDashboard();
 
             final boolean cargo_preset = mCargoIntake.hasCargo();
-            double height = 0.0;
-            double angle = 0.0;
+            double desired_height = Double.NaN;
+            double desired_angle = Double.NaN;
+            HatchIntakeStateMachine.WantedAction idle_hatch_intake = mHatchIntake.hasHatch() ? WantedAction.PREP_SCORE : (mCargoIntake.hasCargo() ? WantedAction.NONE : WantedAction.INTAKE);
             if (mControlBoard.goToGround()) {
-                height = SuperstructureConstants.kGroundHeight;
-                angle = SuperstructureConstants.kGroundAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = SuperstructureConstants.kGroundHeight;
+                desired_angle = SuperstructureConstants.kGroundAngle;
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToStow()) {
-                height = SuperstructureConstants.kStowHeight;
-                angle = SuperstructureConstants.kStowAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = SuperstructureConstants.kStowHeight;
+                desired_angle = SuperstructureConstants.kStowAngle;
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToShip()) {
-                height = cargo_preset ? SuperstructureConstants.kCargoShipForwardsHeight : 
+                desired_height = cargo_preset ? SuperstructureConstants.kCargoShipForwardsHeight : 
                     SuperstructureConstants.kHatchShipForwardsHeight;
-                angle = cargo_preset ? SuperstructureConstants.kCargoShipForwardsAngle : 
+                desired_angle = cargo_preset ? SuperstructureConstants.kCargoShipForwardsAngle : 
                     SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToFirstLevel()) {
-                height = cargo_preset ? SuperstructureConstants.kCargoRocketFirstHeight : SuperstructureConstants.kHatchRocketFirstHeight;
-                angle = cargo_preset ? SuperstructureConstants.kCargoRocketFirstAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketFirstHeight : SuperstructureConstants.kHatchRocketFirstHeight;
+                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketFirstAngle : SuperstructureConstants.kHatchForwardsAngle;
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToSecondLevel()) {
-                height = cargo_preset ? SuperstructureConstants.kCargoRocketSecondHeight : SuperstructureConstants.kHatchRocketSecondHeight;
-                angle = cargo_preset ? SuperstructureConstants.kCargoRocketSecondAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketSecondHeight : SuperstructureConstants.kHatchRocketSecondHeight;
+                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketSecondAngle : SuperstructureConstants.kHatchForwardsAngle;
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToThirdLevel()) {
-                height = cargo_preset ? SuperstructureConstants.kCargoRocketThirdHeight : SuperstructureConstants.kHatchRocketThirdHeight;
-                angle = cargo_preset ? SuperstructureConstants.kCargoRocketThirdAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketThirdHeight : SuperstructureConstants.kHatchRocketThirdHeight;
+                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketThirdAngle : SuperstructureConstants.kHatchForwardsAngle;
+                mHatchIntake.setState(idle_hatch_intake);
             } else if (mControlBoard.goToFirstLevelBackwards() && !cargo_preset) {
-                height = SuperstructureConstants.kHatchRocketBackwardsHeight;
-                angle = SuperstructureConstants.kHatchBackwardsAngle;
-                mHatchIntake.setState(WantedAction.PREP_SCORE);
+                desired_height = SuperstructureConstants.kHatchRocketBackwardsHeight;
+                desired_angle = SuperstructureConstants.kHatchBackwardsAngle;
+                mHatchIntake.setState(idle_hatch_intake);
+            } else if (mControlBoard.getScoreHatch()) {
+                mHatchIntake.setState(WantedAction.SCORE);
+            } else {
+                mHatchIntake.setState(WantedAction.NONE);
             }
 
-            if (mControlBoard.getScoreHatch()) {
-                mHatchIntake.setState(WantedAction.SCORE);
+            if (mControlBoard.getRunIntake()) {
+                mCargoIntake.setState(CargoIntake.WantedAction.INTAKE);
+            } else if (mControlBoard.getRunOuttake()) {
+                mCargoIntake.setState(CargoIntake.WantedAction.OUTTAKE);
+            } else {
+                mCargoIntake.setState(CargoIntake.WantedAction.NONE);
+            }
+            
+            if (Double.isNaN(desired_angle) && Double.isNaN(desired_height)) {
+                mSuperstructure.setWantedAction(SuperstructureStateMachine.WantedAction.IDLE);
+            } else if (Double.isNaN(desired_angle)) {
+                mSuperstructure.setDesiredHeight(desired_height);
+            } else if (Double.isNaN(desired_height)) {
+                mSuperstructure.setDesiredAngle(desired_angle);
+            } else if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
+                mSuperstructure.setDesiredAngle(desired_angle);
+                mSuperstructure.setDesiredHeight(desired_height);
+            }
+
+            double elevator_jog = mControlBoard.getJogElevatorThrottle();
+            if(Math.abs(elevator_jog) > Constants.kJoystickJogThreshold) {
+                elevator_jog =
+                        (elevator_jog - Math.signum(elevator_jog) *
+                                Constants.kJoystickJogThreshold) /
+                                (1.0 - Constants.kJoystickJogThreshold);
+                mSuperstructure.setElevatorJog(
+                        elevator_jog * SuperstructureConstants.kElevatorJogThrottle);
+            }
+
+            double wrist_jog = mControlBoard.getJogWristThrottle();
+            if(Math.abs(wrist_jog) > Constants.kJoystickJogThreshold) {
+                wrist_jog =
+                        (wrist_jog - Math.signum(wrist_jog) *
+                                Constants.kJoystickJogThreshold) /
+                                (1.0 - Constants.kJoystickJogThreshold);
+                mSuperstructure.setWristJog(
+                        wrist_jog * SuperstructureConstants.kWristJogThrottle);
             }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
