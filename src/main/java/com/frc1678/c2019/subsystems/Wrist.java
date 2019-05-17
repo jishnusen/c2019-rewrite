@@ -253,18 +253,18 @@ public class Wrist extends Subsystem {
                     }
 
                     switch (mSystemState) {
-                    case OPEN_LOOP:
-                        // Handled in writePeriodicOutputs
-                        break;
-                    case MOTION_PROFILING:
-                        // Handled in writePeriodicOutputs
-                        break;
-                    case HOMING:
-                        mSystemState = SystemState.OPEN_LOOP;
+                        case OPEN_LOOP:
+                            // Handled in writePeriodicOutputs
+                            break;
+                        case MOTION_PROFILING:
+                            // Handled in writePeriodicOutputs
+                            break;
+                        case HOMING:
+                            mSystemState = SystemState.OPEN_LOOP;
 
-                        break;
-                    default:
-                        System.out.println("Fell through on Wrist states!");
+                            break;
+                        default:
+                            System.out.println("Fell through on Wrist states!");
                     }
                 }
             }

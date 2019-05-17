@@ -4,9 +4,12 @@ import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.frc1678.c2019.Constants;
+import com.frc1678.c2019.loops.ILooper;
+import com.frc1678.c2019.loops.Loop;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.TalonSRXUtil;
+import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,6 +31,7 @@ public class Elevator extends Subsystem {
     private final Solenoid mShifter;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private ElevatorControlState mElevatorControlState = ElevatorControlState.OPEN_LOOP;
+    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
 
     private boolean mHasBeenZeroed = false;
 
@@ -304,6 +308,25 @@ public class Elevator extends Subsystem {
         return mHasBeenZeroed;
     }
 
+    @Override
+    public void registerEnabledLoops(ILooper enabledLooper) {
+        enabledLooper.register(new Loop() {
+            @Override
+            public void onStart(double timestamp) {
+                // startLogging();
+            }
+
+            @Override
+            public void onLoop(double timestamp) {
+            }
+
+            @Override
+            public void onStop(double timestamp) {
+                stopLogging();
+            }
+        });
+    }
+
     public synchronized void resetIfAtLimit() {
         if (mPeriodicIO.limit_switch) {
             zeroSensors();
@@ -416,6 +439,19 @@ public class Elevator extends Subsystem {
                         });
 
         return leftSide && rightSide;
+    }
+
+    public synchronized void startLogging() {
+        if (mCSVWriter == null) {
+            mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/ELEVATOR-LOGS.csv", PeriodicIO.class);
+        }
+    }
+
+    public synchronized void stopLogging() {
+        if (mCSVWriter != null) {
+            mCSVWriter.flush();
+            mCSVWriter = null;
+        }
     }
 
     private enum ElevatorControlState {
