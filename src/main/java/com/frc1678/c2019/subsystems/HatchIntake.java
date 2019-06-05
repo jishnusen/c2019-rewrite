@@ -78,7 +78,7 @@ public class HatchIntake extends Subsystem {
     }
 
     private synchronized void updateActuatorFromState(HatchIntakeState state) {
-        mArrowheadSolenoid.set(state.arrowheadSolenoid);
+        mArrowheadSolenoid.set(!state.arrowheadSolenoid);
         if (mWantedAction != WantedAction.NONE) {
             CargoIntake.getInstance().forceIntakeIn();
         }

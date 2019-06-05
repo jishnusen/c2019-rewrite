@@ -1,7 +1,7 @@
 package com.frc1678.c2019;
 
 import com.frc1678.c2019.subsystems.Drive;
-import com.frc1678.c2019.subsystems.Limelight;
+//import com.frc1678.c2019.subsystems.Limelight;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -25,7 +25,7 @@ public class RobotState {
     private static final int kObservationBufferSize = 100;
     private static final double kMinStability = 0.5;
     private final double exchange_differential_height_ = 24.5;
-    private final Rotation2d limelight_pitch_ = Rotation2d.fromDegrees(32.0);
+//    private final Rotation2d limelight_pitch_ = Rotation2d.fromDegrees(32.0);
     private GoalTracker exchange_tracker_ = new GoalTracker();
 
     // FPGATimestamp -> RigidTransform2d or Rotation2d
@@ -114,7 +114,7 @@ public class RobotState {
     }
 
 
-
+/*
     public void addVisionUpdate(double timestamp, List<Limelight.TargetInfo> vision_update) {
         if(vision_update.size() != 2)
             return;
@@ -126,6 +126,7 @@ public class RobotState {
         }
         exchange_tracker_.update(timestamp, getTargetPoseFromPositions(positions.get(0), positions.get(1), robot_pose));
     }
+
 
     public void addVisionUpdate(double timestamp, Limelight.TargetInfo vision_update) {
         Pose2d robot_pose = getFieldToVehicle(timestamp).transformBy(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180.0)));
@@ -150,7 +151,7 @@ public class RobotState {
         double scalar = perpendicular_distance / target.horizontalAngle.cos();
         return target.horizontalAngle.toTranslation().scale(scalar);
     }
-
+*/
     private static Pose2d getTargetPoseFromPositions(Translation2d left, Translation2d right, Pose2d robot_pose) {
         Translation2d target_center = left.interpolate(right, 0.5);
         Translation2d target_to_robot = new Translation2d(target_center, robot_pose.getTranslation());

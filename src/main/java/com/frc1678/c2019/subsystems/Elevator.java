@@ -190,12 +190,12 @@ public class Elevator extends Subsystem {
         mMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, 20);
         mMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 20);
 
-        mMaster.setInverted(true);
-        mMaster.setSensorPhase(true);
+        mMaster.setInverted(false);
+        mMaster.setSensorPhase(false);
 
         mRightSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kElevatorRightSlaveId,
                 Constants.kElevatorMasterId);
-        mRightSlave.setInverted(true);
+        mRightSlave.setInverted(false);
 
         mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kElevatorLeftSlaveAId,
                 Constants.kElevatorMasterId);
@@ -369,7 +369,7 @@ public class Elevator extends Subsystem {
             mPeriodicIO.active_trajectory_accel_g = 0.0;
         }
         mPeriodicIO.output_percent = mMaster.getMotorOutputPercent();
-        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isFwdLimitSwitchClosed();
+        mPeriodicIO.limit_switch = mMaster.getSensorCollection().isRevLimitSwitchClosed();
         mPeriodicIO.t = t;
 
         if (getInchesOffGround() > Constants.kElevatorEpsilon && !mShifter.get()) {
@@ -382,6 +382,10 @@ public class Elevator extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        if (!mHasBeenZeroed) {
+                mMaster.set(ControlMode.PercentOutput, 0.0);
+        }
+
         if(mElevatorControlState == ElevatorControlState.MOTION_MAGIC) {
             mMaster.set(ControlMode.MotionMagic,
                     mPeriodicIO.demand, DemandType.ArbitraryFeedForward, mPeriodicIO.feedforward);

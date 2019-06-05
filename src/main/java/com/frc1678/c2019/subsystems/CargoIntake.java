@@ -17,9 +17,9 @@ import java.util.ArrayList;
 
 public class CargoIntake extends Subsystem {
     // Intaking is positive
-    public static double kIntakeVoltage = 12.0;
-    public static double kHoldingVoltage = 4.0;
-    public static double kOuttakeVoltage = -10.0;
+    public static double kIntakeVoltage = -12.0;
+    public static double kHoldingVoltage = -4.0;
+    public static double kOuttakeVoltage = 10.0;
 
     private static CargoIntake mInstance;
 

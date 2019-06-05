@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class Wrist extends Subsystem {
     private static final int kMagicMotionSlot = 0;
     private static final int kPositionControlSlot = 1;
-    private static final int kForwardSoftLimit = 2100; // Encoder ticks.
+    private static final int kForwardSoftLimit = (int) ((190.0) * ((4096 * 2.933) / (180.0))) ; // Encoder ticks.
     private static final int kReverseSoftLimit = -500; // Encoder ticks. TODO make ~0 once skipping is fixed.
 
     private static final double kHomingOutput = -0.25;
@@ -366,7 +366,7 @@ public class Wrist extends Subsystem {
         if ((getSetpoint() > SuperstructureConstants.kWristSafeBackwardsAngle
                 && getAngle() < SuperstructureConstants.kWristSafeBackwardsAngle)
                 || (getSetpoint() < SuperstructureConstants.kWristSafeForwardsAngle
-                        && getSetpoint() > SuperstructureConstants.kWristSafeForwardsAngle)) {
+                        && getAngle() > SuperstructureConstants.kWristSafeForwardsAngle)) {
             return true; // Wrist is going to pass through soon
         } else {
             return false;
@@ -374,11 +374,11 @@ public class Wrist extends Subsystem {
     }
 
     private double sensorUnitsToDegrees(double units) {
-        return units * (180.0 * 1.25 * 0.0254 * 1.6) / (4096.0);
+        return units * (360.0) / (4096.0 * 2.933);
     }
 
     private double degreesToSensorUnits(double degrees) {
-        return degrees * (4096) / (180.0 * 1.25 * 0.0254 * 1.6);
+        return degrees * (4096 * 2.933) / (360);
     }
 
     @Override
@@ -450,9 +450,17 @@ public class Wrist extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        if (!mHasBeenZeroed) {
+            mMaster.set(ControlMode.PercentOutput, 0.0);
+        }
+
         if (mDesiredState == SystemState.MOTION_PROFILING) {
-            mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
+            if (mPeriodicIO.demand < 350 && (getAngle() < 10 || mPeriodicIO.limit_switch)) {
+                mMaster.set(ControlMode.PercentOutput, 0.0);
+            } else {
+                mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.feedforward);
+            }
         } else if (mDesiredState == SystemState.POSITION_PID) {
             mMaster.set(ControlMode.Position, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.feedforward);
