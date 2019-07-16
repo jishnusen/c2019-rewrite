@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
                         Elevator.getInstance(),
                         CarriageCanifier.getInstance(),
                         Infrastructure.getInstance()
-                        //Limelight.getInstance()//,
+                        //Limelight.getInstance(),
         )
     );
 
