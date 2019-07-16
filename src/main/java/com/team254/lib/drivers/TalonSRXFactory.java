@@ -59,7 +59,9 @@ public class TalonSRXFactory {
 
     // Create a CANTalon with the default (out of the box) configuration.
     public static TalonSRX createDefaultTalon(int id) {
-        return createTalon(id, kDefaultConfiguration);
+        final TalonSRX talon = new LazyTalonSRX(id);
+        talon.configFactoryDefault();
+        return talon;
     }
 
     public static TalonSRX createPermanentSlaveTalon(int id, int master_id) {
