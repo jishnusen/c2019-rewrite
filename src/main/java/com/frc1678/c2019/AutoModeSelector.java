@@ -34,6 +34,7 @@ public class AutoModeSelector {
         mModeChooser = new SendableChooser<>();
         mModeChooser.setDefaultOption("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
         mModeChooser.addOption("Do Nothing", DesiredMode.DO_NOTHING);
+        mModeChooser.addOption("Characterize Drive", DesiredMode.CHARACTERIZE_DRIVE);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
@@ -44,13 +45,13 @@ public class AutoModeSelector {
 
     public void updateModeCreator() {
         DesiredMode desiredMode = mModeChooser.getSelected();
-        StartingPosition staringPosition = mStartPositionChooser.getSelected();
-        if(mCachedDesiredMode != desiredMode || staringPosition != mCachedStartingPosition) {
-            System.out.println("Auto selection changed, updating creator: desiredMode->" + desiredMode.name() + ", starting position->" + staringPosition.name());
-            mCreator = getCreatorForParams(desiredMode, staringPosition);
+        StartingPosition startingPosition = mStartPositionChooser.getSelected();
+        if(mCachedDesiredMode != desiredMode || startingPosition != mCachedStartingPosition) {
+            System.out.println("Auto selection changed, updating creator: desiredMode->" + desiredMode.name() + ", starting position->" + startingPosition.name());
+            mCreator = getCreatorForParams(desiredMode, startingPosition);
         }
         mCachedDesiredMode = desiredMode;
-        mCachedStartingPosition = staringPosition;
+        mCachedStartingPosition = startingPosition;
     }
 
     private Optional<AutoModeCreator> getCreatorForParams(DesiredMode mode, StartingPosition position) {

@@ -18,20 +18,20 @@ import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.statemachines.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
     private IControlBoard mControlBoard = ControlBoard.getInstance();
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
-    //private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
+    private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private boolean had_cargo_ = false;
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
@@ -45,7 +45,7 @@ public class Robot extends IterativeRobot {
                         Elevator.getInstance(),
                         CarriageCanifier.getInstance(),
                         Infrastructure.getInstance()
-                        //Limelight.getInstance()//,
+                        //Limelight.getInstance(),
         )
     );
 
@@ -63,7 +63,6 @@ public class Robot extends IterativeRobot {
     public Robot() {
         CrashTracker.logRobotConstruction();
         mTrajectoryGenerator.generateTrajectories();
-
     }
 
     @Override
@@ -102,9 +101,9 @@ public class Robot extends IterativeRobot {
                 Drive.getInstance().zeroSensors();
                 RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
-                            // Reset all auto mode state.
-                //mAutoModeSelector.reset();
-                //mAutoModeSelector.updateModeCreator();
+                // Reset all auto mode state.
+                mAutoModeSelector.reset();
+                mAutoModeSelector.updateModeCreator();
                 mAutoModeExecuter = new AutoModeExecuter();
 
                 mDisabledLooper.start();
@@ -175,7 +174,7 @@ public class Robot extends IterativeRobot {
                 mEnabledLooper.stop();
 
                 mDrive.checkSystem();
-                //mIntake.checkSystem();
+                //mCargoIntake.checkSystem();
                 //mWrist.checkSystem();
                 //mElevator.checkSystem();
 
@@ -195,7 +194,7 @@ public class Robot extends IterativeRobot {
                 outputToSmartDashboard();
                 mElevator.resetIfAtLimit();
                 mWrist.resetIfAtLimit();
-/*
+
                 mAutoModeSelector.updateModeCreator();
 
                 Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
@@ -204,7 +203,7 @@ public class Robot extends IterativeRobot {
                         mAutoModeExecuter.setAutoMode(autoMode.get());
                         System.gc();
                 }
-*/
+
 
         } catch (Throwable t) {
                 CrashTracker.logThrowableCrash(t);
@@ -344,7 +343,7 @@ public class Robot extends IterativeRobot {
             Elevator.getInstance().outputTelemetry();
             Infrastructure.getInstance().outputTelemetry();
             mEnabledLooper.outputToSmartDashboard();
-            //mAutoModeSelector.outputToSmartDashboard();
+            mAutoModeSelector.outputToSmartDashboard();
             // SmartDashboard.updateValues();
     }
 }

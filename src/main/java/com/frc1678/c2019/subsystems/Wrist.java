@@ -455,7 +455,7 @@ public class Wrist extends Subsystem {
         }
 
         if (mDesiredState == SystemState.MOTION_PROFILING) {
-            if (mPeriodicIO.demand < 350 && (getAngle() < 10 || mPeriodicIO.limit_switch)) {
+            if ((getSetpoint() < 5) && (getAngle() < 5 || mPeriodicIO.limit_switch)) {
                 mMaster.set(ControlMode.PercentOutput, 0.0);
             } else {
                 mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
