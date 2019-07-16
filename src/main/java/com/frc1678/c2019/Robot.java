@@ -63,7 +63,6 @@ public class Robot extends IterativeRobot {
     public Robot() {
         CrashTracker.logRobotConstruction();
         mTrajectoryGenerator.generateTrajectories();
-
     }
 
     @Override
