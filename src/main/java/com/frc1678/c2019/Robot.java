@@ -174,7 +174,7 @@ public class Robot extends IterativeRobot {
                 mEnabledLooper.stop();
 
                 mDrive.checkSystem();
-                //mIntake.checkSystem();
+                //mCargoIntake.checkSystem();
                 //mWrist.checkSystem();
                 //mElevator.checkSystem();
 
