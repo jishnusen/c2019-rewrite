@@ -18,14 +18,14 @@ import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.statemachines.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Robot extends IterativeRobot {
+public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
