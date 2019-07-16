@@ -31,7 +31,7 @@ public class Robot extends IterativeRobot {
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
     private IControlBoard mControlBoard = ControlBoard.getInstance();
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
-    //private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
+    private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private boolean had_cargo_ = false;
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
@@ -102,9 +102,9 @@ public class Robot extends IterativeRobot {
                 Drive.getInstance().zeroSensors();
                 RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
-                            // Reset all auto mode state.
-                //mAutoModeSelector.reset();
-                //mAutoModeSelector.updateModeCreator();
+                // Reset all auto mode state.
+                mAutoModeSelector.reset();
+                mAutoModeSelector.updateModeCreator();
                 mAutoModeExecuter = new AutoModeExecuter();
 
                 mDisabledLooper.start();
@@ -195,7 +195,7 @@ public class Robot extends IterativeRobot {
                 outputToSmartDashboard();
                 mElevator.resetIfAtLimit();
                 mWrist.resetIfAtLimit();
-/*
+
                 mAutoModeSelector.updateModeCreator();
 
                 Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
@@ -204,7 +204,7 @@ public class Robot extends IterativeRobot {
                         mAutoModeExecuter.setAutoMode(autoMode.get());
                         System.gc();
                 }
-*/
+
 
         } catch (Throwable t) {
                 CrashTracker.logThrowableCrash(t);
@@ -344,7 +344,7 @@ public class Robot extends IterativeRobot {
             Elevator.getInstance().outputTelemetry();
             Infrastructure.getInstance().outputTelemetry();
             mEnabledLooper.outputToSmartDashboard();
-            //mAutoModeSelector.outputToSmartDashboard();
+            mAutoModeSelector.outputToSmartDashboard();
             // SmartDashboard.updateValues();
     }
 }
