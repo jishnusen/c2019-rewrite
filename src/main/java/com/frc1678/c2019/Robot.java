@@ -18,6 +18,8 @@ import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.statemachines.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,30 +35,24 @@ public class Robot extends TimedRobot {
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
     private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private boolean had_cargo_ = false;
+    private boolean climb_mode = false;
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
-        Arrays.asList(
-                        RobotStateEstimator.getInstance(),
-                        Drive.getInstance(),
-                        Superstructure.getInstance(),
-                        HatchIntake.getInstance(),
-                        CargoIntake.getInstance(),
-                        Wrist.getInstance(),
-                        Elevator.getInstance(),
-                        CarriageCanifier.getInstance(),
-                        Infrastructure.getInstance()
-                        //Limelight.getInstance(),
-        )
-    );
+            Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), Superstructure.getInstance(),
+                    HatchIntake.getInstance(), CargoIntake.getInstance(), Wrist.getInstance(), Elevator.getInstance(),
+                    Climber.getInstance(), CarriageCanifier.getInstance(), Infrastructure.getInstance()
+            // Limelight.getInstance(),
+            ));
 
     private Drive mDrive = Drive.getInstance();
-//    private Limelight mLimelight = Limelight.getInstance();
+    // private Limelight mLimelight = Limelight.getInstance();
     private HatchIntake mHatchIntake = HatchIntake.getInstance();
     private CargoIntake mCargoIntake = CargoIntake.getInstance();
     private Wrist mWrist = Wrist.getInstance();
     private Infrastructure mInfrastructure = Infrastructure.getInstance();
     private Superstructure mSuperstructure = Superstructure.getInstance();
     private Elevator mElevator = Elevator.getInstance();
+    private Climber mClimber = Climber.getInstance();
 
     private AutoModeExecuter mAutoModeExecuter;
 
@@ -68,11 +64,13 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         try {
-            /*//init camera stream
-            UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-            camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15);
-            MjpegServer cameraServer = new MjpegServer("serve_USB Camera 0", Constants.kCameraStreamPort);
-            cameraServer.setSource(camera);*/
+            /*
+             * //init camera stream UsbCamera camera =
+             * CameraServer.getInstance().startAutomaticCapture();
+             * camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15); MjpegServer
+             * cameraServer = new MjpegServer("serve_USB Camera 0",
+             * Constants.kCameraStreamPort); cameraServer.setSource(camera);
+             */
 
             CrashTracker.logRobotInit();
 
@@ -87,29 +85,34 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void robotPeriodic() {
+        mWrist.setCoast(!DriverStation.getInstance().isEnabled());
+    }
+
+    @Override
     public void disabledInit() {
         SmartDashboard.putString("Match Cycle", "DISABLED");
         try {
-                CrashTracker.logDisabledInit();
-                mEnabledLooper.stop();
-                if (mAutoModeExecuter != null) {
-                    mAutoModeExecuter.stop();
-                }
-                
-                mInfrastructure.setIsDuringAuto(true);
+            CrashTracker.logDisabledInit();
+            mEnabledLooper.stop();
+            if (mAutoModeExecuter != null) {
+                mAutoModeExecuter.stop();
+            }
 
-                Drive.getInstance().zeroSensors();
-                RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
+            mInfrastructure.setIsDuringAuto(true);
 
-                // Reset all auto mode state.
-                mAutoModeSelector.reset();
-                mAutoModeSelector.updateModeCreator();
-                mAutoModeExecuter = new AutoModeExecuter();
+            Drive.getInstance().zeroSensors();
+            RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
-                mDisabledLooper.start();
+            // Reset all auto mode state.
+            mAutoModeSelector.reset();
+            mAutoModeSelector.updateModeCreator();
+            mAutoModeExecuter = new AutoModeExecuter();
+
+            mDisabledLooper.start();
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
 
     }
@@ -119,22 +122,22 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Match Cycle", "AUTONOMOUS");
 
         try {
-                CrashTracker.logAutoInit();
-                mDisabledLooper.stop();
+            CrashTracker.logAutoInit();
+            mDisabledLooper.stop();
 
-                RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
+            RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
-                Drive.getInstance().zeroSensors();
-                mInfrastructure.setIsDuringAuto(true);
+            Drive.getInstance().zeroSensors();
+            mInfrastructure.setIsDuringAuto(true);
 
-                mWrist.setRampRate(Constants.kAutoWristRampRate);
+            mWrist.setRampRate(Constants.kAutoWristRampRate);
 
-                mAutoModeExecuter.start();
+            mAutoModeExecuter.start();
 
-                mEnabledLooper.start();
+            mEnabledLooper.start();
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 
@@ -143,23 +146,23 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Match Cycle", "TELEOP");
 
         try {
-                CrashTracker.logTeleopInit();
-                mDisabledLooper.stop();
-                if (mAutoModeExecuter != null) {
-                    mAutoModeExecuter.stop();
-                }
+            CrashTracker.logTeleopInit();
+            mDisabledLooper.stop();
+            if (mAutoModeExecuter != null) {
+                mAutoModeExecuter.stop();
+            }
 
-                mInfrastructure.setIsDuringAuto(false);
-                mWrist.setRampRate(Constants.kWristRampRate);
+            mInfrastructure.setIsDuringAuto(false);
+            mWrist.setRampRate(Constants.kWristRampRate);
 
-                RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
-                mEnabledLooper.start();
+            RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
+            mEnabledLooper.start();
 
-                mDrive.setVelocity(DriveSignal.NEUTRAL, DriveSignal.NEUTRAL);
-                mDrive.setOpenLoop(new DriveSignal(0.05, 0.05));
+            mDrive.setVelocity(DriveSignal.NEUTRAL, DriveSignal.NEUTRAL);
+            mDrive.setOpenLoop(new DriveSignal(0.05, 0.05));
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 
@@ -168,19 +171,19 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Match Cycle", "TEST");
 
         try {
-                System.out.println("Starting check systems.");
+            System.out.println("Starting check systems.");
 
-                mDisabledLooper.stop();
-                mEnabledLooper.stop();
+            mDisabledLooper.stop();
+            mEnabledLooper.stop();
 
-                mDrive.checkSystem();
-                //mCargoIntake.checkSystem();
-                //mWrist.checkSystem();
-                //mElevator.checkSystem();
+            mDrive.checkSystem();
+            // mCargoIntake.checkSystem();
+            // mWrist.checkSystem();
+            // mElevator.checkSystem();
 
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 
@@ -188,26 +191,25 @@ public class Robot extends TimedRobot {
     public void disabledPeriodic() {
         SmartDashboard.putString("Match Cycle", "DISABLED");
 
-        //mLimelight.setStream(2);
+        // mLimelight.setStream(2);
 
         try {
-                outputToSmartDashboard();
-                mElevator.resetIfAtLimit();
-                mWrist.resetIfAtLimit();
+            outputToSmartDashboard();
+            mElevator.resetIfAtLimit();
+            mWrist.resetIfAtLimit();
 
-                mAutoModeSelector.updateModeCreator();
+            mAutoModeSelector.updateModeCreator();
 
-                Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
-                if (autoMode.isPresent() && autoMode.get() != mAutoModeExecuter.getAutoMode()) {
-                        System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
-                        mAutoModeExecuter.setAutoMode(autoMode.get());
-                        System.gc();
-                }
-
+            Optional<AutoModeBase> autoMode = mAutoModeSelector.getAutoMode();
+            if (autoMode.isPresent() && autoMode.get() != mAutoModeExecuter.getAutoMode()) {
+                System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
+                mAutoModeExecuter.setAutoMode(autoMode.get());
+                System.gc();
+            }
 
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 
@@ -219,8 +221,8 @@ public class Robot extends TimedRobot {
         try {
 
         } catch (Throwable t) {
-                CrashTracker.logThrowableCrash(t);
-                throw t;
+            CrashTracker.logThrowableCrash(t);
+            throw t;
         }
     }
 
@@ -239,89 +241,122 @@ public class Robot extends TimedRobot {
             final boolean cargo_preset = mCargoIntake.hasCargo();
             double desired_height = Double.NaN;
             double desired_angle = Double.NaN;
-            HatchIntakeStateMachine.WantedAction idle_hatch_intake = mHatchIntake.hasHatch() ? WantedAction.PREP_SCORE : (mCargoIntake.hasCargo() ? WantedAction.NONE : WantedAction.INTAKE);
-            if (mControlBoard.goToGround()) {
-                desired_height = SuperstructureConstants.kGroundHeight;
-                desired_angle = SuperstructureConstants.kGroundAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToStow()) {
-                desired_height = SuperstructureConstants.kStowHeight;
-                desired_angle = SuperstructureConstants.kStowAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToShip()) {
-                desired_height = cargo_preset ? SuperstructureConstants.kCargoShipForwardsHeight : 
-                    SuperstructureConstants.kHatchShipForwardsHeight;
-                desired_angle = cargo_preset ? SuperstructureConstants.kCargoShipForwardsAngle : 
-                    SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToFirstLevel() && !mControlBoard.goToFirstLevelBackwards()) {
-                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketFirstHeight : SuperstructureConstants.kHatchRocketFirstHeight;
-                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketFirstAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToSecondLevel()) {
-                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketSecondHeight : SuperstructureConstants.kHatchRocketSecondHeight;
-                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketSecondAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToThirdLevel()) {
-                desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketThirdHeight : SuperstructureConstants.kHatchRocketThirdHeight;
-                desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketThirdAngle : SuperstructureConstants.kHatchForwardsAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.goToFirstLevelBackwards()/* && !cargo_preset*/) {
-                desired_height = SuperstructureConstants.kHatchRocketBackwardsHeight;
-                desired_angle = SuperstructureConstants.kHatchBackwardsAngle;
-                mHatchIntake.setState(idle_hatch_intake);
-            } else if (mControlBoard.getScoreHatch()) {
-                mHatchIntake.setState(WantedAction.SCORE);
-            } else {
-                mHatchIntake.setState(WantedAction.NONE);
-            }
-
-            if (mControlBoard.getRunIntake()) {
-                mCargoIntake.setState(CargoIntake.WantedAction.INTAKE);
-            } else if (mControlBoard.getRunOuttake()) {
-                mCargoIntake.setState(CargoIntake.WantedAction.OUTTAKE);
-            } else {
-                mCargoIntake.setState(CargoIntake.WantedAction.NONE);
-            }
-
-            if (mCargoIntake.hasCargo() && !had_cargo_ && !mControlBoard.getRunOuttake()) {
-                if (mElevator.getInchesOffGround() < 5 && mWrist.getAngle() < 5) {
+            HatchIntakeStateMachine.WantedAction idle_hatch_intake = mHatchIntake.hasHatch() ? WantedAction.PREP_SCORE
+                    : (mCargoIntake.hasCargo() ? WantedAction.NONE : WantedAction.INTAKE);
+            if (!climb_mode) {
+                if (mControlBoard.goToGround()) {
+                    desired_height = SuperstructureConstants.kGroundHeight;
+                    desired_angle = SuperstructureConstants.kGroundAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToStow()) {
                     desired_height = SuperstructureConstants.kStowHeight;
                     desired_angle = SuperstructureConstants.kStowAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToShip()) {
+                    desired_height = cargo_preset ? SuperstructureConstants.kCargoShipForwardsHeight
+                            : SuperstructureConstants.kHatchShipForwardsHeight;
+                    desired_angle = cargo_preset ? SuperstructureConstants.kCargoShipForwardsAngle
+                            : SuperstructureConstants.kHatchForwardsAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToFirstLevel() && !mControlBoard.goToFirstLevelBackwards()) {
+                    desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketFirstHeight
+                            : SuperstructureConstants.kHatchRocketFirstHeight;
+                    desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketFirstAngle
+                            : SuperstructureConstants.kHatchForwardsAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToSecondLevel()) {
+                    desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketSecondHeight
+                            : SuperstructureConstants.kHatchRocketSecondHeight;
+                    desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketSecondAngle
+                            : SuperstructureConstants.kHatchForwardsAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToThirdLevel()) {
+                    desired_height = cargo_preset ? SuperstructureConstants.kCargoRocketThirdHeight
+                            : SuperstructureConstants.kHatchRocketThirdHeight;
+                    desired_angle = cargo_preset ? SuperstructureConstants.kCargoRocketThirdAngle
+                            : SuperstructureConstants.kHatchForwardsAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.goToFirstLevelBackwards()/* && !cargo_preset */) {
+                    desired_height = SuperstructureConstants.kHatchRocketBackwardsHeight;
+                    desired_angle = SuperstructureConstants.kHatchBackwardsAngle;
+                    mHatchIntake.setState(idle_hatch_intake);
+                } else if (mControlBoard.getScoreHatch()) {
+                    mHatchIntake.setState(WantedAction.SCORE);
+                } else {
+                    mHatchIntake.setState(WantedAction.NONE);
+                }
+
+                if (mControlBoard.getRunIntake()) {
+                    mCargoIntake.setState(CargoIntake.WantedAction.INTAKE);
+                } else if (mControlBoard.getRunOuttake()) {
+                    mCargoIntake.setState(CargoIntake.WantedAction.OUTTAKE);
+                } else {
+                    mCargoIntake.setState(CargoIntake.WantedAction.NONE);
+                }
+
+                if (mCargoIntake.hasCargo() && !had_cargo_ && !mControlBoard.getRunOuttake()) {
+                    if (mElevator.getInchesOffGround() < 5 && mWrist.getAngle() < 5) {
+                        desired_height = SuperstructureConstants.kStowHeight;
+                        desired_angle = SuperstructureConstants.kStowAngle;
+                    }
+                }
+                had_cargo_ = mCargoIntake.hasCargo();
+
+                if (Double.isNaN(desired_angle) && Double.isNaN(desired_height)) {
+                    mSuperstructure.setWantedAction(SuperstructureStateMachine.WantedAction.IDLE);
+                } else if (Double.isNaN(desired_angle)) {
+                    mSuperstructure.setDesiredHeight(desired_height);
+                } else if (Double.isNaN(desired_height)) {
+                    mSuperstructure.setDesiredAngle(desired_angle);
+                } else if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
+                    mSuperstructure.setDesiredAngle(desired_angle);
+                    mSuperstructure.setDesiredHeight(desired_height);
+                }
+            } else {
+                mCargoIntake.forceIntakeIn();
+                mCargoIntake.setState(CargoIntake.WantedAction.NONE);
+
+                if (mControlBoard.dropCrawlers()) {
+                    System.out.println("Attempting DROP");
+                    desired_height = SuperstructureConstants.kCrawlerHeight;
+                    desired_angle = 0;
+                    mClimber.setState(Climber.WantedAction.DROP);
+                }
+
+                if (mElevator.getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight && mControlBoard.Crawl()) {
+                    desired_height = SuperstructureConstants.kKissHeight;
+                    desired_angle = SuperstructureConstants.kBustDownAngle;
+                    if (mElevator.getInchesOffGround() >= SuperstructureConstants.kKissHeight) {
+                        mClimber.setState(Climber.WantedAction.CRAWL);
+                    }
+                }
+                if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
+                    mSuperstructure.setDesiredAngle(desired_angle);
+                    mSuperstructure.setDesiredHeight(desired_height);
                 }
             }
-
             had_cargo_ = mCargoIntake.hasCargo();
-            
-            if (Double.isNaN(desired_angle) && Double.isNaN(desired_height)) {
-                mSuperstructure.setWantedAction(SuperstructureStateMachine.WantedAction.IDLE);
-            } else if (Double.isNaN(desired_angle)) {
-                mSuperstructure.setDesiredHeight(desired_height);
-            } else if (Double.isNaN(desired_height)) {
-                mSuperstructure.setDesiredAngle(desired_angle);
-            } else if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
-                mSuperstructure.setDesiredAngle(desired_angle);
-                mSuperstructure.setDesiredHeight(desired_height);
+
+            if (mControlBoard.climbMode()) {
+                climb_mode = true;
+                System.out.println("climb mode");
+                desired_height = 0;
             }
 
+
+
             double elevator_jog = mControlBoard.getJogElevatorThrottle();
-            if(Math.abs(elevator_jog) > Constants.kJoystickJogThreshold) {
-                elevator_jog =
-                        (elevator_jog - Math.signum(elevator_jog) *
-                                Constants.kJoystickJogThreshold) /
-                                (1.0 - Constants.kJoystickJogThreshold);
-                mSuperstructure.setElevatorJog(
-                        elevator_jog * SuperstructureConstants.kElevatorJogThrottle);
+            if (Math.abs(elevator_jog) > Constants.kJoystickJogThreshold) {
+                elevator_jog = (elevator_jog - Math.signum(elevator_jog) * Constants.kJoystickJogThreshold)
+                        / (1.0 - Constants.kJoystickJogThreshold);
+                mSuperstructure.setElevatorJog(elevator_jog * SuperstructureConstants.kElevatorJogThrottle);
             }
 
             double wrist_jog = mControlBoard.getJogWristThrottle();
-            if(Math.abs(wrist_jog) > Constants.kJoystickJogThreshold) {
-                wrist_jog =
-                        (wrist_jog - Math.signum(wrist_jog) *
-                                Constants.kJoystickJogThreshold) /
-                                (1.0 - Constants.kJoystickJogThreshold);
-                mSuperstructure.setWristJog(
-                        wrist_jog * SuperstructureConstants.kWristJogThrottle);
+            if (Math.abs(wrist_jog) > Constants.kJoystickJogThreshold) {
+                wrist_jog = (wrist_jog - Math.signum(wrist_jog) * Constants.kJoystickJogThreshold)
+                        / (1.0 - Constants.kJoystickJogThreshold);
+                mSuperstructure.setWristJog(wrist_jog * SuperstructureConstants.kWristJogThrottle);
             }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -331,19 +366,19 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-            SmartDashboard.putString("Match Cycle", "TEST");
+        SmartDashboard.putString("Match Cycle", "TEST");
     }
 
     public void outputToSmartDashboard() {
-            RobotState.getInstance().outputToSmartDashboard();
-            Drive.getInstance().outputTelemetry();
-            Wrist.getInstance().outputTelemetry();
-            CargoIntake.getInstance().outputTelemetry();
-            HatchIntake.getInstance().outputTelemetry();
-            Elevator.getInstance().outputTelemetry();
-            Infrastructure.getInstance().outputTelemetry();
-            mEnabledLooper.outputToSmartDashboard();
-            mAutoModeSelector.outputToSmartDashboard();
-            // SmartDashboard.updateValues();
+        RobotState.getInstance().outputToSmartDashboard();
+        Drive.getInstance().outputTelemetry();
+        Wrist.getInstance().outputTelemetry();
+        CargoIntake.getInstance().outputTelemetry();
+        HatchIntake.getInstance().outputTelemetry();
+        Elevator.getInstance().outputTelemetry();
+        Infrastructure.getInstance().outputTelemetry();
+        mEnabledLooper.outputToSmartDashboard();
+        mAutoModeSelector.outputToSmartDashboard();
+        // SmartDashboard.updateValues();
     }
 }

@@ -187,6 +187,10 @@ public class Wrist extends Subsystem {
         return mInstance;
     }
 
+    public synchronized void setCoast(boolean coast) {
+        mMaster.setNeutralMode(coast ? NeutralMode.Coast : NeutralMode.Brake);
+    }
+
     @Override
     public synchronized void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Angle", getAngle());
