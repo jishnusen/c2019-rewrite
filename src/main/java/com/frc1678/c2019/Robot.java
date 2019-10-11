@@ -85,11 +85,6 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void robotPeriodic() {
-        mWrist.setCoast(!DriverStation.getInstance().isEnabled());
-    }
-
-    @Override
     public void disabledInit() {
         SmartDashboard.putString("Match Cycle", "DISABLED");
         try {
@@ -300,18 +295,6 @@ public class Robot extends TimedRobot {
                         desired_angle = SuperstructureConstants.kStowAngle;
                     }
                 }
-                had_cargo_ = mCargoIntake.hasCargo();
-
-                if (Double.isNaN(desired_angle) && Double.isNaN(desired_height)) {
-                    mSuperstructure.setWantedAction(SuperstructureStateMachine.WantedAction.IDLE);
-                } else if (Double.isNaN(desired_angle)) {
-                    mSuperstructure.setDesiredHeight(desired_height);
-                } else if (Double.isNaN(desired_height)) {
-                    mSuperstructure.setDesiredAngle(desired_angle);
-                } else if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
-                    mSuperstructure.setDesiredAngle(desired_angle);
-                    mSuperstructure.setDesiredHeight(desired_height);
-                }
             } else {
                 mCargoIntake.forceIntakeIn();
                 mCargoIntake.setState(CargoIntake.WantedAction.NONE);
@@ -323,18 +306,31 @@ public class Robot extends TimedRobot {
                     mClimber.setState(Climber.WantedAction.DROP);
                 }
 
-                if (mElevator.getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight && mControlBoard.Crawl()) {
-                    desired_height = SuperstructureConstants.kKissHeight;
+                if (mElevator.getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight - 10 && mControlBoard.Crawl()) {
+                    System.out.println("Attempting CRAWL");
+                    desired_height = 0.0;
                     desired_angle = SuperstructureConstants.kBustDownAngle;
-                    if (mElevator.getInchesOffGround() >= SuperstructureConstants.kKissHeight) {
-                        mClimber.setState(Climber.WantedAction.CRAWL);
-                    }
+                    mClimber.setState(Climber.WantedAction.CRAWL);
                 }
-                if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
-                    mSuperstructure.setDesiredAngle(desired_angle);
-                    mSuperstructure.setDesiredHeight(desired_height);
+                if (mControlBoard.finishClimb()) {
+                    System.out.println("Climb done");
+                    desired_angle = SuperstructureConstants.kBustDownAngle;
+                    desired_height = SuperstructureConstants.kBustDown;
+                    mClimber.setState(Climber.WantedAction.DONE);
                 }
             }
+
+            if (Double.isNaN(desired_angle) && Double.isNaN(desired_height)) {
+                mSuperstructure.setWantedAction(SuperstructureStateMachine.WantedAction.IDLE);
+            } else if (Double.isNaN(desired_angle)) {
+                mSuperstructure.setDesiredHeight(desired_height);
+            } else if (Double.isNaN(desired_height)) {
+                mSuperstructure.setDesiredAngle(desired_angle);
+            } else if (!Double.isNaN(desired_angle) && !Double.isNaN(desired_height)) {
+                mSuperstructure.setDesiredAngle(desired_angle);
+                mSuperstructure.setDesiredHeight(desired_height);
+            }
+
             had_cargo_ = mCargoIntake.hasCargo();
 
             if (mControlBoard.climbMode()) {

@@ -37,5 +37,6 @@ public interface IButtonControlBoard {
     boolean exitClimbMode();
     boolean dropCrawlers();
     boolean Crawl();
+    boolean finishClimb();
     // boolean dropForks();
 }

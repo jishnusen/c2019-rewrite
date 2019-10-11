@@ -121,6 +121,11 @@ public class ControlBoard implements IControlBoard {
     }
     
     @Override
+    public boolean finishClimb() {
+          return mButtonControlBoard.finishClimb();
+    }
+    
+    @Override
     public boolean Crawl() {
         return mButtonControlBoard.Crawl();
     }

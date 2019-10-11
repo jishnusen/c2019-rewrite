@@ -14,7 +14,7 @@ import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
 
 public class Climber extends Subsystem {
-    public static double kCrawlerVoltage = 12.0;
+    public static double kCrawlerVoltage = -12.0;
 
     private final VictorSPX mCrawler;
     private final Solenoid mPinsSolenoid, mForksSolenoid, mDropSolenoid;
@@ -124,7 +124,11 @@ public class Climber extends Subsystem {
         }
 
         mForksSolenoid.set(mPeriodicIO.forks_solenoid);
-        mCrawler.set(ControlMode.PercentOutput, mPeriodicIO.crawler_voltage / 12.0);
+        if (Elevator.getInstance().getInchesOffGround() <= 5.0) {
+            mCrawler.set(ControlMode.PercentOutput, mPeriodicIO.crawler_voltage / 12.0);
+        } else {
+            mCrawler.set(ControlMode.PercentOutput, 0.0);
+        }
         mPinsSolenoid.set(mPeriodicIO.pins_solenoid);
         mDropSolenoid.set(mPeriodicIO.drop_solenoid);
     }

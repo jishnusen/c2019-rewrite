@@ -99,12 +99,17 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
 
     @Override
     public boolean dropCrawlers() {
-            return mJoystick.getAButtonPressed();
+            return mJoystick.getAButton();
     }
 
     @Override
     public boolean Crawl() {
-            return mJoystick.getBButtonPressed();
+            return mJoystick.getBButton();
+    }
+
+    @Override
+    public boolean finishClimb() {
+            return mJoystick.getYButton();
     }
 
     @Override
