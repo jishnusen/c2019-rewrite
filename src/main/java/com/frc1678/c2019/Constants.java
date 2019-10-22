@@ -1,8 +1,11 @@
 package com.frc1678.c2019;
+
+import com.frc1678.c2019.subsystems.Limelight.LimelightConstants;
 import edu.wpi.first.wpilibj.Solenoid;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+
 /**
  * A list of constants used by the rest of the robot code. This include physics constants as well as constants
  * determined through calibrations.
@@ -115,6 +118,27 @@ public class Constants {
     public static final int kMainTurnJoystickPort = 0;
     public static final double kJoystickThreshold = 0.5;
     public static final double kJoystickJogThreshold = 0.4;
+
+
+    // Limelight
+
+    public static final LLConstants kTopLimelightConstants = new LLConstants();
+    static {
+        kTopLimelightConstants.kName = "Front Limelight";
+        kTopLimelightConstants.kTableName = "limelight-front";
+        kTopLimelightConstants.kHeight = 99;  // inches
+        kTopLimelightConstants.kAngle = -45; // TODO find units
+    }
+
+    // Bottom limelight
+    public static final LLConstants kBottomLimelightConstants = new LLConstants();
+    static {
+        kBottomLimelightConstants.kName = "Bottom Limelight";
+        kBottomLimelightConstants.kTableName = "limelight-bottom";
+        kBottomLimelightConstants.kHeight = 10;  // inches
+        kTopLimelightConstants.kAngle = 45; // TODO find units
+    }
+
     public static Solenoid makeSolenoidForId(int solenoidId) {
         if (solenoidId < 8) {
             return new Solenoid(solenoidId);
