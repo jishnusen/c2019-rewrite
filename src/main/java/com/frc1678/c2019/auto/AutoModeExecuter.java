@@ -1,6 +1,7 @@
 package com.frc1678.c2019.auto;
 
 import com.team254.lib.util.CrashTrackingRunnable;
+import com.frc1678.c2019.auto.modes.AutoModeBase;
 
 /**
  * This class selects, runs, and stops (if necessary) a specified autonomous mode.
