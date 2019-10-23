@@ -7,7 +7,7 @@
 
 package com.frc1678.c2019;
 
-import com.frc1678.c2019.auto.AutoModeBase;
+import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.auto.AutoModeExecuter;
 import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.paths.TrajectoryGenerator;
