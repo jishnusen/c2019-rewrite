@@ -33,6 +33,7 @@ public class Superstructure extends Subsystem {
     private Wrist mWrist = Wrist.getInstance();
     private HatchIntake mHatchIntake = HatchIntake.getInstance();
     private CargoIntake mCargoIntake = CargoIntake.getInstance();
+    private Climber mClimber = Climber.getInstance();
     private SuperstructureStateMachine mStateMachine = new SuperstructureStateMachine();
     private SuperstructureStateMachine.WantedAction mWantedAction =
             SuperstructureStateMachine.WantedAction.IDLE;

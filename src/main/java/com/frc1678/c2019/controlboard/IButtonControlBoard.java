@@ -31,4 +31,12 @@ public interface IButtonControlBoard {
     boolean getScoreHatch();
 
     void setRumble(boolean on);
+
+    // Climbing
+    boolean climbMode();
+    boolean exitClimbMode();
+    boolean dropCrawlers();
+    boolean Crawl();
+    boolean finishClimb();
+    // boolean dropForks();
 }

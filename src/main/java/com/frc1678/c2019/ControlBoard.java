@@ -103,5 +103,38 @@ public class ControlBoard implements IControlBoard {
     public void setRumble(boolean on) {
         mButtonControlBoard.setRumble(on);
     }
+
+    // Climbing
+    @Override
+    public boolean climbMode() {
+        return mButtonControlBoard.climbMode();
+    }
+
+    @Override
+    public boolean exitClimbMode() {
+        return mButtonControlBoard.exitClimbMode();
+    }
+
+    @Override
+    public boolean dropCrawlers() {
+          return mButtonControlBoard.dropCrawlers();
+    }
+    
+    @Override
+    public boolean finishClimb() {
+          return mButtonControlBoard.finishClimb();
+    }
+    
+    @Override
+    public boolean Crawl() {
+        return mButtonControlBoard.Crawl();
+    }
+ /*   
+    if we add forks
+    @Override
+    public boolean dropForks() {
+        return mButtonControlBoard.dropForks();
+    }    
+*/
 }
 

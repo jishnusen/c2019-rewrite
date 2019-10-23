@@ -90,4 +90,32 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
     public void setRumble(boolean on) {
         mJoystick.setRumble(RumbleType.kRightRumble, on ? 1.0 : 0.0);
     }
+
+    @Override
+    public boolean climbMode() {
+        return mJoystick.getBumper(Hand.kLeft) &&  mJoystick.getBumper(Hand.kRight) && 
+        (mJoystick.getTriggerAxis(Hand.kLeft) > Constants.kJoystickThreshold) && (mJoystick.getTriggerAxis(Hand.kRight) > Constants.kJoystickThreshold); 
+    }
+
+    @Override
+    public boolean dropCrawlers() {
+            return mJoystick.getAButton();
+    }
+
+    @Override
+    public boolean Crawl() {
+            return mJoystick.getBButton();
+    }
+
+    @Override
+    public boolean finishClimb() {
+            return mJoystick.getYButton();
+    }
+
+    @Override
+    public boolean exitClimbMode() {
+            return mJoystick.getPOV() == 180;
+    }
+
+
 }
