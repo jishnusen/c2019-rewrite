@@ -51,6 +51,10 @@ public class SuperstructureConstants {
     public static double kElevatorBoardHeight = 56;
     public static double kElevatorRezeroCurrentThreshold = 3;  // tune
 
+    // Limelight height constants
+
+    public static double kSwitchLimelightHeight = 20; // rough estimate
+
     // wrist constants
     public static double kHatchForwardsAngle = 0.0;
     public static double kHatchBackwardsAngle = 170.0;

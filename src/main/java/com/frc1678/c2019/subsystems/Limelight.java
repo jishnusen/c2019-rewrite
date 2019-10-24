@@ -1,7 +1,6 @@
 package com.frc1678.c2019.subsystems;
 
 import com.frc1678.c2019.Constants;
-import com.frc1678.c2019.RobotState;
 import com.team254.lib.util.Util;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;

@@ -15,7 +15,6 @@ public class LimelightManager extends Subsystem {
     private static LimelightManager sInstance = null;
     private Limelight mTopLimelight;
     private Limelight mBottomLimelight;
-    private Elevator mElevator;
     private List<Limelight> mAllLimelights;
 
     enum ActiveLimelight {
@@ -29,7 +28,6 @@ public class LimelightManager extends Subsystem {
         mTopLimelight = new Limelight(Constants.kTopLimelightConstants);
         mBottomLimelight = new Limelight(Constants.kBottomLimelightConstants);
         mAllLimelights = List.of(mTopLimelight, mBottomLimelight);
-        mElevator = Elevator.getInstance();
     }
 
     public static LimelightManager getInstance() {
@@ -46,7 +44,6 @@ public class LimelightManager extends Subsystem {
             @Override
             public void onStart(double timestamp) {
                 mAllLimelights.forEach(limelight -> limelight.setLed(Limelight.LedMode.OFF));
-             //   RobotState.getInstance().resetVision();
             }
 
             @Override
@@ -58,15 +55,6 @@ public class LimelightManager extends Subsystem {
                     } else {
                         limelight = mBottomLimelight;
                     }
-              /*      if (mActiveLimelight == ActiveLimelight.TOP &&
-                            mElevator.getPosition() > Constants.kMaxTopLimelightHeight) {
-                        RobotState.getInstance().addVisionUpdate(
-                                timestamp - limelight.getLatency(),
-                                null, getActiveLimelightObject());
-                    } else {
-                        RobotState.getInstance().addVisionUpdate(
-                                timestamp - limelight.getLatency(),
-                    } */
                 }
 
             }
