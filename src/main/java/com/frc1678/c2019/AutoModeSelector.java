@@ -28,8 +28,8 @@ public class AutoModeSelector {
 
     public AutoModeSelector() {
         mModeChooser = new SendableChooser<>();
-        mModeChooser.setDefaultOption("Cross Auto Line", DesiredMode.ROCKET_HATCH);
-        mModeChooser.addOption("Do Nothing", DesiredMode.DO_NOTHING);
+        mModeChooser.setDefaultOption("Do Nothing", DesiredMode.DO_NOTHING);
+        mModeChooser.addOption("Rocket Hatch", DesiredMode.ROCKET_HATCH);
         mModeChooser.addOption("Characterize Drive", DesiredMode.CHARACTERIZE_DRIVE);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
@@ -83,5 +83,9 @@ public class AutoModeSelector {
             return Optional.empty();
         }
         return mAutoMode;
+    }
+
+    public boolean isDriveByCamera() {
+        return mCachedDesiredMode == DesiredMode.DO_NOTHING;
     }
 }
