@@ -1,10 +1,8 @@
 package com.frc1678.c2019.subsystems;
 
 import com.frc1678.c2019.Constants;
-import com.frc1678.c2019.RobotState;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
-import com.frc1678.c2019.subsystems.Elevator;
 import java.util.List;
 
 
@@ -48,7 +46,7 @@ public class LimelightManager extends Subsystem {
             @Override
             public void onStart(double timestamp) {
                 mAllLimelights.forEach(limelight -> limelight.setLed(Limelight.LedMode.OFF));
-                RobotState.getInstance().resetVision();
+             //   RobotState.getInstance().resetVision();
             }
 
             @Override
@@ -60,7 +58,7 @@ public class LimelightManager extends Subsystem {
                     } else {
                         limelight = mBottomLimelight;
                     }
-                    if (mActiveLimelight == ActiveLimelight.TOP &&
+              /*      if (mActiveLimelight == ActiveLimelight.TOP &&
                             mElevator.getPosition() > Constants.kMaxTopLimelightHeight) {
                         RobotState.getInstance().addVisionUpdate(
                                 timestamp - limelight.getLatency(),
@@ -68,8 +66,7 @@ public class LimelightManager extends Subsystem {
                     } else {
                         RobotState.getInstance().addVisionUpdate(
                                 timestamp - limelight.getLatency(),
-                                limelight.getTarget(), getActiveLimelightObject());
-                    }
+                    } */
                 }
 
             }
@@ -141,23 +138,8 @@ public class LimelightManager extends Subsystem {
         return mBottomLimelight;
     }
 
-    public synchronized void setPipeline(int mode) {
-        mAllLimelights.forEach(limelight -> limelight.setPipeline(mode));
-    }
-
-    public synchronized void triggerOutputs() {
-        mAllLimelights.forEach(limelight -> limelight.triggerOutputs());
-    }
-
     public synchronized void setAllLeds(Limelight.LedMode mode) {
         mAllLimelights.forEach(limelight -> limelight.setLed(mode));
     }
 
-    public synchronized void updatePipeline(GamePiece gamePiece) {
-        if (gamePiece == GamePiece.BALL) {
-            setPipeline(Limelight.kSortTopPipeline);
-        } else {
-            setPipeline(Limelight.kDefaultPipeline);
-        }
-    }
 }

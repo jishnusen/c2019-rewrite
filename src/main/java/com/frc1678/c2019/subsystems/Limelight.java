@@ -47,7 +47,7 @@ public class Limelight extends Subsystem {
     } 
 
     public enum LedMode {
-        OFF, BLINK, ON
+        PIPELINE, OFF, BLINK, ON
     }
 
     public synchronized void setLed(LedMode mode) {
@@ -98,6 +98,25 @@ public class Limelight extends Subsystem {
         return mToTheLeft;
 
     }
+
+    public synchronized double getTargetDist() {
+        if (mConstants.kName == "Front Limelight") {
+            mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
+            ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
+        } else if (mConstants.kName == "Back Limelight") {
+            mTargetDist =
+      ((mConstants.kObjectHeight)*0.0254) /
+      Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));
+        } else {
+            System.out.println("Invalid limelight name");
+        }
+
+
+       
+        return mTargetDist;
+
+    }
+
 
     public Limelight(LLConstants constants) {
         mConstants = constants;
