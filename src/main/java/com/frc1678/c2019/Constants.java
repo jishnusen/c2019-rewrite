@@ -1,6 +1,6 @@
 package com.frc1678.c2019;
 
-import com.frc1678.c2019.subsystems.Limelight.LimelightConstants;
+import com.frc1678.c2019.subsystems.Limelight.LLConstants;
 import edu.wpi.first.wpilibj.Solenoid;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -126,8 +126,8 @@ public class Constants {
     static {
         kTopLimelightConstants.kName = "Front Limelight";
         kTopLimelightConstants.kTableName = "limelight-front";
-        kTopLimelightConstants.kHeight = 99;  // inches
-        kTopLimelightConstants.kAngle = -45; // TODO find units
+        kTopLimelightConstants.kLLHeight = 99;  // inches
+        kTopLimelightConstants.kLLAngle = -45; // TODO find units
     }
 
     // Bottom limelight
@@ -135,8 +135,8 @@ public class Constants {
     static {
         kBottomLimelightConstants.kName = "Bottom Limelight";
         kBottomLimelightConstants.kTableName = "limelight-bottom";
-        kBottomLimelightConstants.kHeight = 10;  // inches
-        kTopLimelightConstants.kAngle = 45; // TODO find units
+        kBottomLimelightConstants.kLLHeight = 10;  // inches
+        kTopLimelightConstants.kLLAngle = 45; // TODO find units
     }
 
     public static Solenoid makeSolenoidForId(int solenoidId) {

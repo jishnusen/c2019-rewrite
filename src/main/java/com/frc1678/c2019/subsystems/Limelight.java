@@ -19,13 +19,15 @@ public class Limelight extends Subsystem {
     private boolean mUpdateOutputs= true;
     private double mHeading;
     private double mTargetDist;
+    public boolean mSeesTarget = false;
+    public boolean mToTheLeft;
 
     public static class LLConstants {
         public String kName = "";
         public String kTableName = "";
-        double kObjectHeight = 0.0;
-        double kLLAngle = 0.0;
-        double kLLKeight = 0.0;
+        public double kObjectHeight = 0.0;
+        public double kLLAngle = 0.0;
+        public double kLLHeight = 0.0;
     }
 
     private NetworkTable mNetworkTable;
@@ -35,10 +37,7 @@ public class Limelight extends Subsystem {
         public int givenLedMode;
         public double xOffset;
         public double yOffset;
-        boolean mSeesTarget = false;
         public double skew;
-        boolean mToTheLeft;
-
 
         // OUTPUTS
         public int ledMode = 1; // 0 - use pipeline mode, 1 - off, 2 - blink, 3 - on
@@ -86,7 +85,7 @@ public class Limelight extends Subsystem {
         SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
     }
     
-    public synchronized void update() {
+    public synchronized boolean getToTheLeft() {
               
         if (mPeriodicIO.skew > -45) {
             mHeading = Math.abs(mPeriodicIO.skew / 8.);
@@ -96,8 +95,7 @@ public class Limelight extends Subsystem {
             mToTheLeft = true;
         }
 
-        mTargetDist = Math.tan(mPeriodicIO.yOffset);
-
+        return mToTheLeft;
 
     }
 
@@ -107,7 +105,7 @@ public class Limelight extends Subsystem {
     }
 
     public double getLatency() {
-       // return mPeriodicIO.latency;
+       return mPeriodicIO.latency;
     }
 
 
