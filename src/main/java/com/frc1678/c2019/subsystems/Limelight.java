@@ -37,7 +37,6 @@ public class Limelight extends Subsystem {
         public double xOffset;
         public double yOffset;
         public double skew;
-
         // OUTPUTS
         public int ledMode = 1; // 0 - use pipeline mode, 1 - off, 2 - blink, 3 - on
         public int camMode = 0; // 0 - vision processing, 1 - driver camera
@@ -59,7 +58,7 @@ public class Limelight extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
      //   mPeriodicIO.latency = mNetworkTable.getEntry("tl").getDouble(0) / 1000.0 + Constants.kImageCaptureLatency;
-        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0);
+        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0) * (Math.PI / 180);
         mPeriodicIO.skew = mNetworkTable.getEntry("ts").getDouble(0.0);
         mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(1.0);
         mPeriodicIO.yOffset = mNetworkTable.getEntry("ty").getDouble(0.0);
@@ -84,8 +83,7 @@ public class Limelight extends Subsystem {
         SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
     }
     
-    public synchronized boolean getToTheLeft() {
-              
+    public synchronized boolean getToTheLeft() {      
         if (mPeriodicIO.skew > -45) {
             mHeading = Math.abs(mPeriodicIO.skew / 8.);
             mToTheLeft = true;
@@ -108,13 +106,11 @@ public class Limelight extends Subsystem {
       Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));
         } else {
             System.out.println("Invalid limelight name");
-        }
-
-
-       
+        }       
         return mTargetDist;
 
     }
+
 
 
     public Limelight(LLConstants constants) {
