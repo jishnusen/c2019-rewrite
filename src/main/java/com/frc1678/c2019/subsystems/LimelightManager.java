@@ -3,6 +3,7 @@ package com.frc1678.c2019.subsystems;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
+import com.frc1678.c2019.states.SuperstructureConstants;
 import java.util.List;
 
 
@@ -58,6 +59,7 @@ public class LimelightManager extends Subsystem {
                         System.out.println("Bottom limelight is active with a target distance of: " + limelight.getTargetDist());
                     }
                 }
+                setActiveLimelight();
 
             }
 
@@ -98,8 +100,14 @@ public class LimelightManager extends Subsystem {
         return mActiveLimelight;
     }
 
-    public synchronized void setUseTopLimelight(boolean useTop) {
-        mActiveLimelight = useTop ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
+    // public synchronized void setUseTopLimelight(boolean useTop) {
+    //    mActiveLimelight = useTop ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
+    //    getInactiveLimelightObject().setLed(Limelight.LedMode.OFF);
+    //    getActiveLimelightObject().setLed(Limelight.LedMode.PIPELINE);
+   // }
+
+    public synchronized void setActiveLimelight() {
+        mActiveLimelight = Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
         getInactiveLimelightObject().setLed(Limelight.LedMode.OFF);
         getActiveLimelightObject().setLed(Limelight.LedMode.PIPELINE);
     }
