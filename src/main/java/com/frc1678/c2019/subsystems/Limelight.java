@@ -16,7 +16,6 @@ public class Limelight extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private LLConstants mConstants = null;
     private boolean mUpdateOutputs= true;
-    private double mHeading;
     private double mTargetDist;
     public boolean mSeesTarget = false;
     public boolean mToTheLeft;
@@ -33,15 +32,11 @@ public class Limelight extends Subsystem {
     
     public static class PeriodicIO {
         public double latency;
-        public int givenLedMode;
         public double xOffset;
         public double yOffset;
         public double skew;
         // OUTPUTS
         public int ledMode = 1; // 0 - use pipeline mode, 1 - off, 2 - blink, 3 - on
-        public int camMode = 0; // 0 - vision processing, 1 - driver camera
-        public int stream = 2; // sets stream layout if another webcam is attached
-        public int snapshot = 0;
     } 
 
     public enum LedMode {
@@ -58,16 +53,17 @@ public class Limelight extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
      //   mPeriodicIO.latency = mNetworkTable.getEntry("tl").getDouble(0) / 1000.0 + Constants.kImageCaptureLatency;
-        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0) * (Math.PI / 180);
+        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0);
         mPeriodicIO.skew = mNetworkTable.getEntry("ts").getDouble(0.0);
-        mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(1.0);
         mPeriodicIO.yOffset = mNetworkTable.getEntry("ty").getDouble(0.0);
+        mPeriodicIO.latency = mNetworkTable.getEntry("tl").getDouble(0.0);
         mSeesTarget = mNetworkTable.getEntry("tv").getDouble(0) == 1.0;
     }
 
     @Override
     public synchronized void writePeriodicOutputs() {
-        
+        if (mUpdateOutputs) {
+            mNetworkTable.getEntry("ledMode").setNumber(mPeriodicIO.ledMode);        }
     }
 
     @Override
@@ -82,36 +78,15 @@ public class Limelight extends Subsystem {
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
     }
-    
-    public synchronized boolean getToTheLeft() {      
-        if (mPeriodicIO.skew > -45) {
-            mHeading = Math.abs(mPeriodicIO.skew / 8.);
-            mToTheLeft = true;
-        } else {
-            mHeading = Math.abs((mPeriodicIO.skew + 90) / 8.);
-            mToTheLeft = true;
-        }
 
-        return mToTheLeft;
-
-    }
-
-    public synchronized double getTargetDist() {
-        if (mConstants.kName == "Front Limelight") {
-            mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
-            ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
-        } else if (mConstants.kName == "Back Limelight") {
-            mTargetDist =
-      ((mConstants.kObjectHeight)*0.0254) /
-      Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));
-        } else {
-            System.out.println("Invalid limelight name");
-        }       
+    public double getTargetDist() {
+        mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) * (mConstants.kLLHeight - mConstants.kObjectHeight);
         return mTargetDist;
-
     }
 
-
+    public double getTargetHorizOffset() {
+        return mPeriodicIO.xOffset;
+    } 
 
     public Limelight(LLConstants constants) {
         mConstants = constants;
