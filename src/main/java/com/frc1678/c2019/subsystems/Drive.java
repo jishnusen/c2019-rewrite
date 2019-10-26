@@ -2,6 +2,7 @@ package com.frc1678.c2019.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.frc1678.c2019.Constants;
@@ -18,11 +19,13 @@ import com.team254.lib.trajectory.TrajectoryIterator;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.ReflectingCSVWriter;
+import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.ArrayList;
+// import com.frc1678.lib.control.PIDController;
+
 
 public class Drive extends Subsystem {
 
@@ -174,6 +177,44 @@ public class Drive extends Subsystem {
             mLeftMaster.configNeutralDeadband(0.04, 0);
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
+        mPeriodicIO.left_demand = signal.getLeft();
+        mPeriodicIO.right_demand = signal.getRight();
+        mPeriodicIO.left_feedforward = 0.0;
+        mPeriodicIO.right_feedforward = 0.0;
+    }
+
+    /**
+     * Configure talons for open loop control
+     */
+    public synchronized void updateVisionPID() {
+        if (mDriveControlState != DriveControlState.OPEN_LOOP) {
+            setBrakeMode(false);
+
+            System.out.println("Switching to open loop");
+            System.out.println(signal);
+            mDriveControlState = DriveControlState.OPEN_LOOP;
+            mLeftMaster.configNeutralDeadband(0.04, 0);
+            mRightMaster.configNeutralDeadband(0.04, 0);
+        }
+
+
+
+        PIDController throttlePID = new PIDController(.005, .4, .0001, );
+        PIDController steeringPID = new PIDController(.005, .4, .0001, );
+
+        double throttle = throttlePID.update;
+        double steering = steeringPID.update;
+
+        double leftVoltage = (throttle - steering) / 12.0;
+        double rightVoltage = (throttle + steering) / 12.0;
+
+        
+        Util.limit(rightVoltage, 1.0);
+        Util.limit(leftVoltage, 1.0);
+        
+        DriveSignal signal = new DriveSignal(leftVoltage, rightVoltage);
+
+
         mPeriodicIO.left_demand = signal.getLeft();
         mPeriodicIO.right_demand = signal.getRight();
         mPeriodicIO.left_feedforward = 0.0;
