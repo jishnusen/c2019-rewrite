@@ -6,4 +6,8 @@ public interface IDriveControlBoard {
     double getTurn();
 
     boolean getQuickTurn();
+
+    boolean getVision();
+
+    boolean getStartVision();
 }

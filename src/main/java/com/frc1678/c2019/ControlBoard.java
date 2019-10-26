@@ -36,6 +36,16 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public boolean getVision() {
+        return mDriveControlBoard.getVision();
+    }
+
+    @Override
+    public boolean getStartVision() {
+        return mDriveControlBoard.getStartVision();
+    }
+
+    @Override
     public boolean goToGround() {
         return mButtonControlBoard.goToGround();
     }
