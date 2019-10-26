@@ -9,6 +9,7 @@ import com.frc1678.c2019.RobotState;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.planners.DriveMotionPlanner;
+import com.frc1678.lib.control.PIDController;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
@@ -41,6 +42,8 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
     private boolean mOverrideTrajectory = false;
+    private PIDController steering_controller;
+    private double prev_ts = 0.0;
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -130,6 +133,10 @@ public class Drive extends Subsystem {
         setBrakeMode(false);
 
         mMotionPlanner = new DriveMotionPlanner();
+
+        steering_controller = new PIDController(new PIDController.PIDGains(0.3, 0.01, 0.0));
+        steering_controller.setContinuous(false);
+        steering_controller.setInputRange(-1.0, 1.0);
     }
 
     public static Drive getInstance() {
@@ -178,6 +185,23 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_demand = signal.getRight();
         mPeriodicIO.left_feedforward = 0.0;
         mPeriodicIO.right_feedforward = 0.0;
+    }
+
+    public synchronized void setVision(boolean first_run, double throttle) {
+        if (first_run) {
+            steering_controller.reset();
+            steering_controller.setSetpoint(0.0);
+            prev_ts = Timer.getFPGATimestamp();
+        }
+        final LimelightManager.ActiveLimelight active_limelight = LimelightManager.getInstance().getActiveLimelight();
+        double steering = 0.0;
+        if (active_limelight == LimelightManager.ActiveLimelight.TOP) {
+            steering = steering_controller.calculate(Math.toRadians(LimelightManager.getInstance().getTopLimelight().getTargetHorizOffset()), Timer.getFPGATimestamp() - prev_ts);
+        }
+
+        setOpenLoop(new DriveSignal(-steering, steering));
+
+        prev_ts = Timer.getFPGATimestamp();
     }
 
     /**
