@@ -192,6 +192,7 @@ public class Drive extends Subsystem {
             steering_controller.reset();
             steering_controller.setSetpoint(0.0);
             prev_ts = Timer.getFPGATimestamp();
+            System.out.println("Starting vision cycle");
         }
         final LimelightManager.ActiveLimelight active_limelight = LimelightManager.getInstance().getActiveLimelight();
         double steering = 0.0;
