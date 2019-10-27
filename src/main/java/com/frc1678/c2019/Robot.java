@@ -41,7 +41,6 @@ public class Robot extends TimedRobot {
             Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), LimelightManager.getInstance(), Superstructure.getInstance(),
                     HatchIntake.getInstance(), CargoIntake.getInstance(), Wrist.getInstance(), Elevator.getInstance(),
                     Climber.getInstance(), CarriageCanifier.getInstance(), Infrastructure.getInstance()
-            // Limelight.getInstance(),
             ));
 
     private Drive mDrive = Drive.getInstance();
@@ -231,14 +230,10 @@ public class Robot extends TimedRobot {
         double turn = mControlBoard.getTurn();
 
         try {
-            if (mControlBoard.getStartVisionPressed()) {
-                mDrive.updateVisionPID(true);
-            }
-
             if (!vision) {
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
             } else {
-                mDrive.updateVisionPID(false);
+                mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
             }
            
            
