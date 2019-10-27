@@ -60,7 +60,6 @@ public class LimelightManager extends Subsystem {
                     }
                 }
                 setActiveLimelight();
-
             }
 
             @Override
