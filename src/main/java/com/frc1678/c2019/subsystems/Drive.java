@@ -46,6 +46,7 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
+    private static boolean visionOn = false;
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -197,11 +198,15 @@ public class Drive extends Subsystem {
             mLeftMaster.configNeutralDeadband(0.04, 0);
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
-
-
+        visionOn = true;
 
         PIDController throttlePID = new PIDController(6.0, 0.0, .001);
         PIDController steeringPID = new PIDController(1.5, .1, 0);
+
+        if (visionOn) {
+         throttlePID.reset();
+         steeringPID.reset();   
+        }
 
         double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
         double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
@@ -219,6 +224,8 @@ public class Drive extends Subsystem {
         DriveSignal signal = new DriveSignal(leftVoltage, rightVoltage);
 
         setOpenLoop(signal);
+
+        visionOn = false;
     }
 
     /**
