@@ -192,7 +192,7 @@ public class Drive extends Subsystem {
     /**
      * Configure talons for open loop control
      */
-    public synchronized void updateVisionPID() {
+    public synchronized void updateVisionPID(boolean firstRun) {
         throttlePID.setGoal(0.0);
         steeringPID.setGoal(0.0);
 

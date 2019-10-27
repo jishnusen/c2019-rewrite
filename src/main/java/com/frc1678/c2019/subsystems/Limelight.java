@@ -67,6 +67,9 @@ public class Limelight extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        if (mUpdateOutputs) {
+            mNetworkTable.getEntry("ledMode").setNumber(mPeriodicIO.ledMode); 
+        }
         
     }
 
@@ -104,7 +107,7 @@ public class Limelight extends Subsystem {
         if (mConstants.kName == "Front Limelight") {
             mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
             ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
-        } else if (mConstants.kName == "Back Limelight") {
+        } else if (mConstants.kName == "Bottom Limelight") {
             mTargetDist =
       ((mConstants.kObjectHeight)*0.0254) /
       Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));
