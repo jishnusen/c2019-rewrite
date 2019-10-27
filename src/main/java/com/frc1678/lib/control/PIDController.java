@@ -17,7 +17,6 @@ public class PIDController {
     private double prevTime = 0.0;
     
     public PIDController(double p, double i, double d) {
-        setpoint = sp;
         kP = p;
         kI = i;
         kD = d;
