@@ -46,7 +46,10 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
+    private final PIDController throttlePID = new PIDController(6.0, 0.0, .001);
+    private final PIDController steeringPID = new PIDController(1.5, .1, 0);
     private static boolean visionOn = false;
+    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -190,6 +193,9 @@ public class Drive extends Subsystem {
      * Configure talons for open loop control
      */
     public synchronized void updateVisionPID() {
+        throttlePID.setGoal(0.0);
+        steeringPID.setGoal(0.0);
+
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
             setBrakeMode(false);
 
@@ -198,10 +204,8 @@ public class Drive extends Subsystem {
             mLeftMaster.configNeutralDeadband(0.04, 0);
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
-        visionOn = true;
 
-        PIDController throttlePID = new PIDController(6.0, 0.0, .001);
-        PIDController steeringPID = new PIDController(1.5, .1, 0);
+        visionOn = true;
 
         if (visionOn) {
          throttlePID.reset();
