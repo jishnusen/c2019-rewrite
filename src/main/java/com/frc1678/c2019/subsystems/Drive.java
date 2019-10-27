@@ -47,9 +47,7 @@ public class Drive extends Subsystem {
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
     private final PIDController throttlePID = new PIDController(6.0, 0.0, .001);
-    private final PIDController steeringPID = new PIDController(1.5, .1, 0);
-    private static boolean visionOn = false;
-    
+    private final PIDController steeringPID = new PIDController(1.5, .1, 0);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -193,8 +191,14 @@ public class Drive extends Subsystem {
      * Configure talons for open loop control
      */
     public synchronized void updateVisionPID(boolean firstRun) {
-        throttlePID.setGoal(0.0);
-        steeringPID.setGoal(0.0);
+       
+        if (firstRun) {
+            throttlePID.setGoal(0.0);
+            steeringPID.setGoal(0.0);
+
+            throttlePID.reset();
+            steeringPID.reset();   
+        }
 
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
             setBrakeMode(false);
@@ -203,13 +207,6 @@ public class Drive extends Subsystem {
             mDriveControlState = DriveControlState.OPEN_LOOP;
             mLeftMaster.configNeutralDeadband(0.04, 0);
             mRightMaster.configNeutralDeadband(0.04, 0);
-        }
-
-        visionOn = true;
-
-        if (visionOn) {
-         throttlePID.reset();
-         steeringPID.reset();   
         }
 
         double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
@@ -226,10 +223,7 @@ public class Drive extends Subsystem {
         Util.limit(leftVoltage, 1.0);
         
         DriveSignal signal = new DriveSignal(leftVoltage, rightVoltage);
-
         setOpenLoop(signal);
-
-        visionOn = false;
     }
 
     /**
