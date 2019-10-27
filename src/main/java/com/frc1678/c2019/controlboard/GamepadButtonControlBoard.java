@@ -1,9 +1,9 @@
 package com.frc1678.c2019.controlboard;
 
 import com.frc1678.c2019.Constants;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class GamepadButtonControlBoard implements IButtonControlBoard {
     private static GamepadButtonControlBoard mInstance = null;
@@ -91,6 +91,8 @@ public class GamepadButtonControlBoard implements IButtonControlBoard {
         mJoystick.setRumble(RumbleType.kRightRumble, on ? 1.0 : 0.0);
     }
 
+
+    // climb
     @Override
     public boolean climbMode() {
         return mJoystick.getBumper(Hand.kLeft) &&  mJoystick.getBumper(Hand.kRight) && 
