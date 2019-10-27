@@ -39,6 +39,10 @@ public class ControlBoard implements IControlBoard {
     public boolean getStartVision() {
         return mDriveControlBoard.getStartVision();
     }
+
+    public boolean getStartVisionPressed() {
+        return mDriveControlBoard.getStartVisionPressed();
+    }
     
     @Override
     public boolean goToGround() {

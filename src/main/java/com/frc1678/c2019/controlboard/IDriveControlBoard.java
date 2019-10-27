@@ -8,4 +8,7 @@ public interface IDriveControlBoard {
     boolean getQuickTurn();
     
     boolean getStartVision();
+
+    boolean getStartVisionPressed();
+
 }
