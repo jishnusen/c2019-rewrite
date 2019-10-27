@@ -224,7 +224,7 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         SmartDashboard.putString("Match Cycle", "TELEOP");
         double timestamp = Timer.getFPGATimestamp();
-        boolean vision = false;
+        boolean vision = mControlBoard.getStartVision();
 
         double throttle = mControlBoard.getThrottle();
         double turn = mControlBoard.getTurn();
