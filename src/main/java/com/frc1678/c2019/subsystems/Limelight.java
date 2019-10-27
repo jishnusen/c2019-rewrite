@@ -96,6 +96,10 @@ public class Limelight extends Subsystem {
 
     }
 
+    public synchronized double getXOffset() {
+        return mPeriodicIO.xOffset;
+    }
+
     public synchronized double getTargetDist() {
         if (mConstants.kName == "Front Limelight") {
             mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
