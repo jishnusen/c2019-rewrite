@@ -100,6 +100,15 @@ public class LimelightManager extends Subsystem {
         return mActiveLimelight;
     }
 
+    public synchronized double getXOffset() {
+        return getActiveLimelightObject().getXOffset();  
+    }
+
+
+    public synchronized double getTargetDist() {
+        return getActiveLimelightObject().getTargetDist();  
+    }
+
     // public synchronized void setUseTopLimelight(boolean useTop) {
     //    mActiveLimelight = useTop ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
     //    getInactiveLimelightObject().setLed(Limelight.LedMode.OFF);
