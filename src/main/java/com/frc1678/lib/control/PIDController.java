@@ -38,7 +38,7 @@ public class PIDController {
         return (kP * error) + (kI * calculateIntegral(dt, error)) + (kD * calculateDerivative(dt, error));
     }
 
-    public void setSetPoint(double setpoint) {
+    public void setGoal(double setpoint) {
         this.setpoint = setpoint;
     }
 
