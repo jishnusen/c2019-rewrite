@@ -199,11 +199,14 @@ public class Drive extends Subsystem {
 
 
 
-        PIDController throttlePID = new PIDController(.005, .4, .0001, );
-        PIDController steeringPID = new PIDController(.005, .4, .0001, );
+        PIDController throttlePID = new PIDController(.005, .4, .0001);
+        PIDController steeringPID = new PIDController(.005, .4, .0001);
 
         double throttle = throttlePID.update;
         double steering = steeringPID.update;
+
+        throttlePID.setSetpoint();
+        steeringPID.setSetpoint();
 
         double leftVoltage = (throttle - steering) / 12.0;
         double rightVoltage = (throttle + steering) / 12.0;
