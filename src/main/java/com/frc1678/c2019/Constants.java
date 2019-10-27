@@ -127,7 +127,7 @@ public class Constants {
         kTopLimelightConstants.kName = "Front Limelight";
         kTopLimelightConstants.kTableName = "limelight-front";
         kTopLimelightConstants.kLLHeight = 99;  // inches
-        kTopLimelightConstants.kLLAngle = -45; // TODO find units
+        kTopLimelightConstants.kLLAngle = -45 * (Math.PI / 180.0); // TODO find units
     }
 
     // Bottom limelight
@@ -136,7 +136,7 @@ public class Constants {
         kBottomLimelightConstants.kName = "Bottom Limelight";
         kBottomLimelightConstants.kTableName = "limelight-bottom";
         kBottomLimelightConstants.kLLHeight = 10;  // inches
-        kTopLimelightConstants.kLLAngle = 45; // TODO find units
+        kTopLimelightConstants.kLLAngle = 45 * (Math.PI / 180.0);; // TODO find units
     }
 
     public static Solenoid makeSolenoidForId(int solenoidId) {

@@ -58,7 +58,7 @@ public class Limelight extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
      //   mPeriodicIO.latency = mNetworkTable.getEntry("tl").getDouble(0) / 1000.0 + Constants.kImageCaptureLatency;
-        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0) * (Math.PI / 180);
+        mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0);
         mPeriodicIO.skew = mNetworkTable.getEntry("ts").getDouble(0.0);
         mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(1.0);
         mPeriodicIO.yOffset = mNetworkTable.getEntry("ty").getDouble(0.0);
