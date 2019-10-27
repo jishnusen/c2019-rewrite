@@ -9,14 +9,14 @@ public class PIDController {
     private double kP;
     private double kI;
     private double kD;
-    private double setpoint;
+    private double setpoint = 0.0;
  
-    private double prevError;
-    private double integral;
+    private double prevError = 0.0;
+    private double integral = 0.0;
 
-    private double prevTime;
+    private double prevTime = 0.0;
     
-    public PIDController(double p, double i, double d, double sp) {
+    public PIDController(double p, double i, double d) {
         setpoint = sp;
         kP = p;
         kI = i;
@@ -24,7 +24,6 @@ public class PIDController {
     }
 
     public void reset() {
-        setpoint = 0;
         prevError = 0;
         prevTime = 0;
         integral = 0;
@@ -32,16 +31,16 @@ public class PIDController {
     }
 
     public double update(double timestamp, double sensor) {
-        prevTime = timestamp;
-        prevError = setpoint - sensor;
-
         double dt = timestamp - prevTime;
-
+        
         double error = setpoint - sensor;
 
+        prevTime = timestamp;
         return (kP * error) + (kI * calculateIntegral(dt, error)) + (kD * calculateDerivative(dt, error));
+    }
 
-
+    public void setSetPoint(double setpoint) {
+        this.setpoint = setpoint;
     }
 
     // calculate functions could have been in the update lol
