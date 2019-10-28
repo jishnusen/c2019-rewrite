@@ -46,8 +46,8 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(6.0, 0.0, .001);
-    private final PIDController steeringPID = new PIDController(1.5, .1, 0);    
+    private final PIDController throttlePID = new PIDController(10, 0.0, 0);
+    private final PIDController steeringPID = new PIDController(0, 0, 0);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -193,11 +193,13 @@ public class Drive extends Subsystem {
     public synchronized void updateVisionPID(boolean firstRun) {
        
         if (firstRun) {
-            throttlePID.setGoal(0.0);
-            steeringPID.setGoal(0.0);
+           throttlePID.setGoal(0.0);
+           steeringPID.setGoal(0.0);
 
-            throttlePID.reset();
-            steeringPID.reset();   
+          throttlePID.reset();
+          steeringPID.reset();
+
+           System.out.println("First run true");   
         }
 
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
@@ -223,6 +225,9 @@ public class Drive extends Subsystem {
         Util.limit(leftVoltage, 1.0);
         
         DriveSignal signal = new DriveSignal(leftVoltage, rightVoltage);
+
+        System.out.println("Vision on boys   Active Limelight is: " + mLLManager.getActiveLimelight());   
+
         setOpenLoop(signal);
     }
 

@@ -104,10 +104,10 @@ public class Limelight extends Subsystem {
     }
 
     public synchronized double getTargetDist() {
-        if (mConstants.kName == "Front Limelight") {
+        if (mConstants.kTableName == "limelight-front") {
             mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
             ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
-        } else if (mConstants.kName == "Bottom Limelight") {
+        } else if (mConstants.kTableName == "limelight-bottom") {
             mTargetDist =
       ((mConstants.kObjectHeight)*0.0254) /
       Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));

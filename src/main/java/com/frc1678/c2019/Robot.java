@@ -230,10 +230,10 @@ public class Robot extends TimedRobot {
         double turn = mControlBoard.getTurn();
 
         try {
-            if (!vision) {
-            mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
-            } else {
+            if (vision) {
                 mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
+            } else {
+                mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
             }
            
            
