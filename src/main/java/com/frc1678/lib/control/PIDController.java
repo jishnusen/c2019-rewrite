@@ -35,6 +35,7 @@ public class PIDController {
         double error = setpoint - sensor;
 
         prevTime = timestamp;
+        System.out.println(dt);
         return (kP * error) + (kI * calculateIntegral(dt, error)) + (kD * calculateDerivative(dt, error));
     }
 
