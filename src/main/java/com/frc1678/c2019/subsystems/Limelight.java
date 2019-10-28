@@ -84,6 +84,8 @@ public class Limelight extends Subsystem {
     @Override
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
+        SmartDashboard.putNumber(mConstants.kName + ": XOffset", getXOffset());
+
     }
     
     public synchronized boolean getToTheLeft() {      

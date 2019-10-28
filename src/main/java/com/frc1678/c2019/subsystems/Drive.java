@@ -46,8 +46,8 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(12, 0.0, 0.02);
-    private final PIDController steeringPID = new PIDController(.15, 0.001, 0.009);    
+    private final PIDController throttlePID = new PIDController(15, 0.0, 0.02);
+    private final PIDController steeringPID = new PIDController(.15, 0.001, 0.02);    
 
     private final Loop mLoop = new Loop() {
         @Override
