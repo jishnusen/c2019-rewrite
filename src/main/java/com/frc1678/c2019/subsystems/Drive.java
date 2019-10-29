@@ -200,7 +200,7 @@ public class Drive extends Subsystem {
           steeringPID.setGoal(0.0);
 
           throttlePID.reset();
-          throttle2PID.reset();
+          throttlePID2.reset();
           steeringPID.reset();
 
           System.out.println("First run true");   
