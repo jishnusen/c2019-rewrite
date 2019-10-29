@@ -128,7 +128,7 @@ public class Constants {
         kTopLimelightConstants.kTableName = "limelight-front";
         kTopLimelightConstants.kLLHeight = 45;  // inches
         kTopLimelightConstants.kObjectHeight = 29;
-        kTopLimelightConstants.kLLAngle = 60; // TODO find units
+        kTopLimelightConstants.kLLAngle = -30; // TODO find units
     }
 
     // Bottom limelight
