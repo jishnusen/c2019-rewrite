@@ -122,7 +122,7 @@ public class LimelightManager extends Subsystem {
         getActiveLimelightObject().setLed(Limelight.LedMode.PIPELINE);
     }
 
-    private synchronized Limelight getActiveLimelightObject() {
+    public synchronized Limelight getActiveLimelightObject() {
         if (mActiveLimelight == ActiveLimelight.TOP) {
             return mTopLimelight;
         } else {
