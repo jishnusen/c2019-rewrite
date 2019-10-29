@@ -193,13 +193,13 @@ public class Drive extends Subsystem {
     public synchronized void updateVisionPID(boolean firstRun) {
        
         if (firstRun) {
-           throttlePID.setGoal(0.0);
-           steeringPID.setGoal(0.0);
+          throttlePID.setGoal(0.0);
+          steeringPID.setGoal(0.0);
 
           throttlePID.reset();
           steeringPID.reset();
 
-           System.out.println("First run true");   
+          System.out.println("First run true");   
         }
 
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
