@@ -191,6 +191,7 @@ public class Robot extends TimedRobot {
             outputToSmartDashboard();
             mElevator.resetIfAtLimit();
             mWrist.resetIfAtLimit();
+            mLLManager.setAllLeds(Limelight.LedMode.OFF);
 
             mAutoModeSelector.updateModeCreator();
 
