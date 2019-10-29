@@ -112,7 +112,7 @@ public class Limelight extends Subsystem {
         } else if (mConstants.kTableName == "limelight-bottom") {
             mTargetDist =
       ((mConstants.kObjectHeight)*0.0254) /
-      Math.tan((mPeriodicIO.yOffset + 30.0) * (Math.PI / 180.));
+      Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.));
         } else {
             System.out.println("Invalid limelight name");
         }       
