@@ -53,12 +53,12 @@ public class LimelightManager extends Subsystem {
                     Limelight limelight;
                     if (mActiveLimelight == ActiveLimelight.TOP) {
                         limelight = mTopLimelight;
-//                        System.out.println("Top limelight is active with a target distance of: " + limelight.getTargetDist());
+                        System.out.println("Top limelight is active with a target distance of: " + limelight.getTargetDist());
                         //System.out.println("Top limelight is active with a offset of: " + limelight.getXOffset());
 
                     } else {
                         limelight = mBottomLimelight;
-                        //System.out.println("Bottom limelight is active with a target distance of: " + limelight.getTargetDist());
+                        System.out.println("Bottom limelight is active with a target distance of: " + limelight.getTargetDist());
                     }
                 }
                 setActiveLimelight();

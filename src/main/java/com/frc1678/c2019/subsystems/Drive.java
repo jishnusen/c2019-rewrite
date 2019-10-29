@@ -10,6 +10,7 @@ import com.frc1678.c2019.RobotState;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.planners.DriveMotionPlanner;
+import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.lib.control.PIDController;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
@@ -22,7 +23,6 @@ import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
-import com.frc1678.c2019.states.SuperstructureConstants;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
@@ -47,9 +47,9 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(15, 0.0, 0.02);
-    private final PIDController throttlePID2 = new PIDController(8, 0.0, 0.02);
-    private final PIDController steeringPID = new PIDController(.15, 0.001, 0.02);    
+    private final PIDController throttlePID = new PIDController(.17, 0.005, 0.0);
+    private final PIDController throttlePID2 = new PIDController(.17, 0.005, 0.0);
+    private final PIDController steeringPID = new PIDController(.15, 0.0, 0.04);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -196,9 +196,11 @@ public class Drive extends Subsystem {
        
         if (firstRun) {
           throttlePID.setGoal(0.0);
+          throttlePID2.setGoal(0.0);
           steeringPID.setGoal(0.0);
 
           throttlePID.reset();
+          throttle2PID.reset();
           steeringPID.reset();
 
           System.out.println("First run true");   
@@ -217,7 +219,7 @@ public class Drive extends Subsystem {
         double throttle2 = throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
         double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
 
-        throttlePID.setGoal(0.0);
+        throttlePID.setGoal(12.0);
         throttlePID2.setGoal(0.0);
         steeringPID.setGoal(0.0);
 
@@ -227,7 +229,6 @@ public class Drive extends Subsystem {
         if (mLLManager.getActiveLimelightObject() == mLLManager.getTopLimelight() || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
           leftVoltage = (throttle + steering) / 12.0;
           rightVoltage = (throttle - steering) / 12.0;
-
         } else {
           leftVoltage = (throttle2 + steering) / 12.0;
           rightVoltage = (throttle2 - steering) / 12.0;

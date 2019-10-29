@@ -108,7 +108,7 @@ public class Limelight extends Subsystem {
     public synchronized double getTargetDist() {
         double difference = mConstants.kLLHeight - mConstants.kObjectHeight;
 
-        mTargetDist = Math.abs((Math.PI / 180.) * mConstants.kLLHeight * Math.tan(kLLAngle + mPeriodicIO.yOffset));
+        mTargetDist = Math.abs(difference * Math.tan(Math.toRadians(mConstants.kLLAngle + mPeriodicIO.yOffset)));
 
      //   if (mConstants.kTableName == "limelight-front") {
       //      mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
