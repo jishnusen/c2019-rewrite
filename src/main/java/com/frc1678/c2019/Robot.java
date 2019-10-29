@@ -379,6 +379,7 @@ public class Robot extends TimedRobot {
         HatchIntake.getInstance().outputTelemetry();
         Elevator.getInstance().outputTelemetry();
         Infrastructure.getInstance().outputTelemetry();
+        LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         // SmartDashboard.updateValues();
