@@ -106,16 +106,20 @@ public class Limelight extends Subsystem {
     }
 
     public synchronized double getTargetDist() {
-        if (mConstants.kTableName == "limelight-front") {
-            mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
-            ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
-        } else if (mConstants.kTableName == "limelight-bottom") {
-            mTargetDist =
-      ((mConstants.kObjectHeight)*0.0254) /
-      Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.));
-        } else {
-            System.out.println("Invalid limelight name");
-        }       
+        double difference = mConstants.kLLHeight - mConstants.kObjectHeight;
+
+        mTargetDist = Math.abs((Math.PI / 180.) * mConstants.kLLHeight * Math.tan(kLLAngle + mPeriodicIO.yOffset));
+
+     //   if (mConstants.kTableName == "limelight-front") {
+      //      mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
+       //     ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
+       // } else if (mConstants.kTableName == "limelight-bottom") {
+       //     mTargetDist =
+      //((mConstants.kObjectHeight)*0.0254) /
+      //Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.));
+       // } else {
+        //    System.out.println("Invalid limelight name");
+        //}       
         return mTargetDist;
 
     }
