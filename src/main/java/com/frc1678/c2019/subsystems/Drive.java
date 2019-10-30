@@ -47,7 +47,7 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(.17, 0.005, 0.0);
+    private final PIDController throttlePID = new PIDController(.1, 0.002, 0.0);
     private final PIDController throttlePID2 = new PIDController(.17, 0.005, 0.0);
     private final PIDController steeringPID = new PIDController(.15, 0.0, 0.04);    
 
@@ -195,7 +195,7 @@ public class Drive extends Subsystem {
     public synchronized void updateVisionPID(boolean firstRun) {
        
         if (firstRun) {
-          throttlePID.setGoal(0.0);
+          throttlePID.setGoal(15.0);
           throttlePID2.setGoal(0.0);
           steeringPID.setGoal(0.0);
 
@@ -218,10 +218,6 @@ public class Drive extends Subsystem {
         double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
         double throttle2 = throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
         double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
-
-        throttlePID.setGoal(12.0);
-        throttlePID2.setGoal(0.0);
-        steeringPID.setGoal(0.0);
 
         double leftVoltage;
         double rightVoltage;

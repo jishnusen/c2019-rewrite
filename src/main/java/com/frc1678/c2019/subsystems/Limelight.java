@@ -63,6 +63,7 @@ public class Limelight extends Subsystem {
         mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(1.0);
         mPeriodicIO.yOffset = mNetworkTable.getEntry("ty").getDouble(0.0);
         mSeesTarget = mNetworkTable.getEntry("tv").getDouble(0) == 1.0;
+        calculateTargetDist();
     }
 
     @Override
@@ -84,7 +85,9 @@ public class Limelight extends Subsystem {
     @Override
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
-        SmartDashboard.putNumber(mConstants.kName + ": XOffset", getXOffset());
+        SmartDashboard.putNumber(mConstants.kName + ": XOffset", mPeriodicIO.xOffset);
+        SmartDashboard.putNumber(mConstants.kName + ": yOffset", mPeriodicIO.yOffset);
+        SmartDashboard.putNumber(mConstants.kName + ": Distance", mTargetDist);
 
     }
     
@@ -105,9 +108,9 @@ public class Limelight extends Subsystem {
         return mPeriodicIO.xOffset;
     }
 
-    public synchronized double getTargetDist() {
+    private synchronized double calculateTargetDist() {
         double difference = mConstants.kLLHeight - mConstants.kObjectHeight;
-
+        System.out.println(mConstants.kTableName + mConstants.kLLAngle);
         mTargetDist = Math.abs(difference * Math.tan(Math.toRadians(mConstants.kLLAngle + mPeriodicIO.yOffset)));
 
      //   if (mConstants.kTableName == "limelight-front") {
@@ -122,6 +125,10 @@ public class Limelight extends Subsystem {
         //}       
         return mTargetDist;
 
+    }
+
+    public double getTargetDist() {
+        return mTargetDist;
     }
 
 
