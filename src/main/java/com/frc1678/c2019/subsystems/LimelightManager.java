@@ -97,17 +97,25 @@ public class LimelightManager extends Subsystem {
         mAllLimelights.forEach(limelight -> limelight.outputTelemetry());
     }
 
-    public synchronized ActiveLimelight getActiveLimelight() {
+    public ActiveLimelight getActiveLimelight() {
         return mActiveLimelight;
     }
 
-    public synchronized double getXOffset() {
+    public double getXOffset() {
         return getActiveLimelightObject().getXOffset();  
     }
 
 
-    public synchronized double getTargetDist() {
+    public double getTargetDist() {
         return getActiveLimelightObject().getTargetDist();  
+    }
+
+    public boolean getHasTarget() {
+        return getActiveLimelightObject().getHasTarget();
+    }
+
+    public boolean getLimelightOK() {
+        return getActiveLimelightObject().getLimelightOK();
     }
 
     // public synchronized void setUseTopLimelight(boolean useTop) {

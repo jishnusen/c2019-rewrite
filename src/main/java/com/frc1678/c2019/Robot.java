@@ -231,12 +231,11 @@ public class Robot extends TimedRobot {
         double turn = mControlBoard.getTurn();
 
         try {
-            if (vision) {
+            if (vision && mLLManager.getHasTarget() && mLLManager.getLimelightOK()) {
                 mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
             } else {
                 mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
             }
-           
            
             outputToSmartDashboard();
 

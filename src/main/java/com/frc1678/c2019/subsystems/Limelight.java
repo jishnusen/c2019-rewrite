@@ -16,10 +16,8 @@ public class Limelight extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private LLConstants mConstants = null;
     private boolean mUpdateOutputs= true;
-    private double mHeading;
     private double mTargetDist;
-    public boolean mSeesTarget = false;
-    public boolean mToTheLeft;
+    private double mLatencyCounter;
 
     public static class LLConstants {
         public String kName = "";
@@ -37,6 +35,9 @@ public class Limelight extends Subsystem {
         public double xOffset;
         public double yOffset;
         public double skew;
+        public boolean hasTarget;
+        public boolean limelightOK;
+
         // OUTPUTS
         public int ledMode = 1; // 0 - use pipeline mode, 1 - off, 2 - blink, 3 - on
         public int camMode = 0; // 0 - vision processing, 1 - driver camera
@@ -60,9 +61,20 @@ public class Limelight extends Subsystem {
      //   mPeriodicIO.latency = mNetworkTable.getEntry("tl").getDouble(0) / 1000.0 + Constants.kImageCaptureLatency;
         mPeriodicIO.xOffset = mNetworkTable.getEntry("tx").getDouble(0.0);
         mPeriodicIO.skew = mNetworkTable.getEntry("ts").getDouble(0.0);
-        mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(1.0);
+        mPeriodicIO.givenLedMode = (int) mNetworkTable.getEntry("ledMode").getDouble(0.0);
         mPeriodicIO.yOffset = mNetworkTable.getEntry("ty").getDouble(0.0);
-        mSeesTarget = mNetworkTable.getEntry("tv").getDouble(0) == 1.0;
+        mPeriodicIO.hasTarget = mNetworkTable.getEntry("tv").getDouble(0.0) == 1.0;
+        final double latency = mNetworkTable.getEntry("tl").getDouble(0.0);
+
+        if (mPeriodicIO.latency == latency) {
+            mLatencyCounter += 1;
+        } else {
+            mLatencyCounter = 0;
+        }
+
+        mPeriodicIO.latency = latency;
+        mPeriodicIO.limelightOK = mLatencyCounter > 10;
+
         calculateTargetDist();
     }
 
@@ -84,45 +96,20 @@ public class Limelight extends Subsystem {
 
     @Override
     public synchronized void outputTelemetry() {
-        SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mSeesTarget);
+        SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mPeriodicIO.hasTarget);
         SmartDashboard.putNumber(mConstants.kName + ": XOffset", mPeriodicIO.xOffset);
         SmartDashboard.putNumber(mConstants.kName + ": yOffset", mPeriodicIO.yOffset);
         SmartDashboard.putNumber(mConstants.kName + ": Distance", mTargetDist);
 
     }
-    
-    public synchronized boolean getToTheLeft() {      
-        if (mPeriodicIO.skew > -45) {
-            mHeading = Math.abs(mPeriodicIO.skew / 8.);
-            mToTheLeft = true;
-        } else {
-            mHeading = Math.abs((mPeriodicIO.skew + 90) / 8.);
-            mToTheLeft = true;
-        }
-
-        return mToTheLeft;
-
-    }
-
-    public synchronized double getXOffset() {
+    public double getXOffset() {
         return mPeriodicIO.xOffset;
     }
 
-    private synchronized double calculateTargetDist() {
-        double difference = mConstants.kLLHeight - mConstants.kObjectHeight;
-        System.out.println(mConstants.kTableName + mConstants.kLLAngle);
-        mTargetDist = Math.abs(difference * Math.tan(Math.toRadians(mConstants.kLLAngle + mPeriodicIO.yOffset)));
-
-     //   if (mConstants.kTableName == "limelight-front") {
-      //      mTargetDist = Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.)) *
-       //     ((mConstants.kLLHeight - mConstants.kObjectHeight) * 0.0254);
-       // } else if (mConstants.kTableName == "limelight-bottom") {
-       //     mTargetDist =
-      //((mConstants.kObjectHeight)*0.0254) /
-      //Math.tan((mPeriodicIO.yOffset + mConstants.kLLAngle) * (Math.PI / 180.));
-       // } else {
-        //    System.out.println("Invalid limelight name");
-        //}       
+    private double calculateTargetDist() {
+        double delta_h = mConstants.kObjectHeight - mConstants.kLLHeight;
+        mTargetDist = Math.abs(delta_h / Math.tan(Math.toRadians(mConstants.kLLAngle + mPeriodicIO.yOffset)));
+ 
         return mTargetDist;
 
     }
@@ -131,7 +118,13 @@ public class Limelight extends Subsystem {
         return mTargetDist;
     }
 
+    public boolean getHasTarget() {
+        return mPeriodicIO.hasTarget;
+    }
 
+    public boolean getLimelightOK() {
+        return mPeriodicIO.limelightOK;
+    }
 
     public Limelight(LLConstants constants) {
         mConstants = constants;
