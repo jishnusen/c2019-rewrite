@@ -48,8 +48,8 @@ public class Drive extends Subsystem {
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
     private final PIDController throttlePID = new PIDController(.1, 0.002, 0.0);
-    private final PIDController throttlePID2 = new PIDController(.17, 0.005, 0.0);
-    private final PIDController steeringPID = new PIDController(.15, 0.0, 0.06);    
+    private final PIDController throttlePID2 = new PIDController(.1, 0.002, 0.0);
+    private final PIDController steeringPID = new PIDController(.15, 0.001, 0.02);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -195,8 +195,8 @@ public class Drive extends Subsystem {
     public synchronized void updateVisionPID(boolean firstRun) {
        
         if (firstRun) {
-          throttlePID.setGoal(23.0);
-          throttlePID2.setGoal(0.0);
+          throttlePID.setGoal(25.0);
+          throttlePID2.setGoal(25.0);
           steeringPID.setGoal(0.0);
 
           throttlePID.reset();
@@ -222,7 +222,7 @@ public class Drive extends Subsystem {
         double leftVoltage;
         double rightVoltage;
 
-        if (mLLManager.getActiveLimelightObject() == mLLManager.getTopLimelight() || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
+        if (mLLManager.getActiveLimelight() == LimelightManager.ActiveLimelight.TOP || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
           leftVoltage = (throttle + steering) / 12.0;
           rightVoltage = (throttle - steering) / 12.0;
         } else {
