@@ -219,11 +219,10 @@ public class Robot extends TimedRobot {
 
         outputToSmartDashboard();
         try {
-            if (false) {
-                mAutoModeExecutor.interrupt();
-            }
             if (mWantsDriverAuto || mAutoModeExecutor.isInterrupted()) {
                 manualControl();
+            } else if (mControlBoard.getInterruptAuto()) {
+                mAutoModeExecutor.interrupt();
             }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
