@@ -73,7 +73,7 @@ public class Limelight extends Subsystem {
         }
 
         mPeriodicIO.latency = latency;
-        mPeriodicIO.limelightOK = mLatencyCounter > 10;
+        mPeriodicIO.limelightOK = mLatencyCounter < 10;
 
         calculateTargetDist();
     }
