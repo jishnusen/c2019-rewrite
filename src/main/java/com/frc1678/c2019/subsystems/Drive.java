@@ -47,9 +47,9 @@ public class Drive extends Subsystem {
     private boolean mOverrideTrajectory = false;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(.1, 0.002, 0.0);
-    private final PIDController throttlePID2 = new PIDController(.1, 0.002, 0.0);
-    private final PIDController steeringPID = new PIDController(.15, 0.001, 0.02);    
+    private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
+    private final PIDController throttlePID2 = new PIDController(.15, 0.00, 0.0);
+    private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -196,11 +196,10 @@ public class Drive extends Subsystem {
        
         if (firstRun) {
           throttlePID.setGoal(25.0);
-          throttlePID2.setGoal(25.0);
+          throttlePID2.setGoal(14.0);
           steeringPID.setGoal(0.0);
 
           throttlePID.reset();
-          throttlePID2.reset();
           steeringPID.reset();
 
           System.out.println("First run true");   
@@ -223,13 +222,13 @@ public class Drive extends Subsystem {
         double rightVoltage;
 
         if (mLLManager.getActiveLimelight() == LimelightManager.ActiveLimelight.TOP || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
-          leftVoltage = (throttle + steering) / 12.0;
-          rightVoltage = (throttle - steering) / 12.0;
-        } else {
-          leftVoltage = (throttle2 + steering) / 12.0;
-          rightVoltage = (throttle2 - steering) / 12.0;
-
-        }
+            leftVoltage = (throttle + steering) / 12.0;
+            rightVoltage = (throttle - steering) / 12.0;
+          } else {
+            leftVoltage = (throttle2 + steering) / 12.0;
+            rightVoltage = (throttle2 - steering) / 12.0;
+  
+          }
 
         
         Util.limit(rightVoltage, 1.0);
