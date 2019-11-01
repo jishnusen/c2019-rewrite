@@ -46,4 +46,7 @@ public class MainDriveControlBoard implements IDriveControlBoard {
         return mThrottleStick.getRawButtonPressed(1);
     }
 
+    public boolean getInterruptAuto() {
+        return mThrottleStick.getRawButton(3);
+    }
 }

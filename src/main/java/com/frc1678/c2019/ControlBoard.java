@@ -44,6 +44,10 @@ public class ControlBoard implements IControlBoard {
         return mDriveControlBoard.getStartVisionPressed();
     }
     
+    public boolean getInterruptAuto() {
+        return mDriveControlBoard.getInterruptAuto();
+    }
+
     @Override
     public boolean goToGround() {
         return mButtonControlBoard.goToGround();
