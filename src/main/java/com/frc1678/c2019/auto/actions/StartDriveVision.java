@@ -9,8 +9,6 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
 
 public class StartDriveVision implements Action {
-    private static final Drive mDrive = Drive.getInstance();
-
     private double mStartTime;
     private boolean useBottomLimelight;
     private  double  mLeft, mRight;
@@ -37,47 +35,18 @@ public class StartDriveVision implements Action {
 
     @Override
     public void start() {
-        mDrive.setOpenLoop(new DriveSignal(mLeft, mRight));
-        mStartTime = Timer.getFPGATimestamp();
+        Drive.getInstance().updateVisionPID(true);
     }
 
   
     @Override
     public void update() {
-
-        throttlePID.setGoal(25.0);
-        throttlePID2.setGoal(14.0);
-        steeringPID.setGoal(0.0);
-
-        steeringPID.reset();
-        throttlePID.reset();
-        throttlePID2.reset();
-
-        double leftVoltage;
-        double rightVoltage;
-
-        double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
-        double throttle2 = throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
-        double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
-
-        if (!useBottomLimelight) {
-            leftVoltage = (throttle + steering) / 12.0;
-            rightVoltage = (throttle - steering) / 12.0;
-          } else {
-            leftVoltage = (throttle2 + steering) / 12.0;
-            rightVoltage = (throttle2 - steering) / 12.0;
-  
-          }
-
-        
-        Util.limit(rightVoltage, 1.0);
-        Util.limit(leftVoltage, 1.0);
-
+        Drive.getInstance().updateVisionPID(false);
     }
 
     @Override
     public void done() {
-        mDrive.setOpenLoop(new DriveSignal(0.0, 0.0));
+        Drive.getInstance().setOpenLoop(new DriveSignal(0.0, 0.0));
     }
 }
 
