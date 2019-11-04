@@ -24,7 +24,7 @@ public class SuperstructureConstants {
     
 
     // elevator constants
-    public static double kHatchShipForwardsHeight = 4;
+    public static double kHatchShipForwardsHeight = 5;
     public static double kHatchShipBackwardsHeight = 5;
     public static double kHatchRocketFirstHeight = 0.1;
     public static double kHatchRocketBackwardsHeight = 5;
