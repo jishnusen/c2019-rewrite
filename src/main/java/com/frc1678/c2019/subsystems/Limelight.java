@@ -15,7 +15,7 @@ public class Limelight extends Subsystem {
 
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private LLConstants mConstants = null;
-    private HatchIntake mHatchIntake = HatchIntake.getInstance();
+    private CargoIntake mCargoIntake = CargoIntake.getInstance();
     private boolean mUpdateOutputs= true;
     private double mTargetDist;
     private double mLatencyCounter;
@@ -78,7 +78,7 @@ public class Limelight extends Subsystem {
         mPeriodicIO.limelightOK = mLatencyCounter < 10;
 
 
-        calculateTargetDist(mHatchIntake.hasHatch());
+        calculateTargetDist(mCargoIntake.hasCargo());
     }
 
     @Override
@@ -109,10 +109,10 @@ public class Limelight extends Subsystem {
         return mPeriodicIO.xOffset;
     }
 
-    private double calculateTargetDist(boolean hatch) {
+    private double calculateTargetDist(boolean cargo) {
         double delta_h;
        
-        if (hatch) {
+        if (!cargo) {
             delta_h = mConstants.kObjectHeight - mConstants.kLLHeight;
         } else {
             delta_h = mConstants.kCargoObjectHeight - mConstants.kLLHeight;

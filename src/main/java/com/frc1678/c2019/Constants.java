@@ -139,7 +139,7 @@ public class Constants {
         kBottomLimelightConstants.kTableName = "limelight-bottom";
         kBottomLimelightConstants.kLLHeight = 6;  // inches
         kBottomLimelightConstants.kObjectHeight = 29;
-        kBottomLimelightConstants.kCargoObjectHeight = 29;
+        kBottomLimelightConstants.kCargoObjectHeight = 37;
         kBottomLimelightConstants.kLLAngle = 40; // TODO find units
     }
 
