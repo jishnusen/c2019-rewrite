@@ -9,24 +9,18 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
 
 public class StartDriveVision implements Action {
-    private double mStartTime;
-    private boolean useBottomLimelight;
-    private  double  mLeft, mRight;
+    private  double endTargetDist;
     
     private final LimelightManager mLLManager = LimelightManager.getInstance();
-    private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
-    private final PIDController throttlePID2 = new PIDController(.15, 0.00, 0.0);
-    private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);
-
   
-    public StartDriveVision(boolean top) {
-        useBottomLimelight = false;
+    public StartDriveVision(double endDistance) {
+        endTargetDist = endDistance;
     }
 
 
     @Override
     public boolean isFinished() {
-        if (steeringPID.isDone() && (throttlePID2.isDone() || throttlePID.isDone)) {
+        if (mLLManager.getActiveLimelightObject().getXOffset() < 1.7 && mLLManager.getActiveLimelightObject().getTargetDist() < endTargetDist) {
             return true;
         } else {
             return false;
