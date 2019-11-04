@@ -237,8 +237,6 @@ public class Drive extends Subsystem {
         
         DriveSignal signal = new DriveSignal(leftVoltage, rightVoltage);
 
-        //System.out.println("Vision on boys   Active Limelight is: " + mLLManager.getActiveLimelight());   
-
         setOpenLoop(signal);
     }
 

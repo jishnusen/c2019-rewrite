@@ -44,6 +44,7 @@ public class LimelightManager extends Subsystem {
         Loop mLoop = new Loop() {
             @Override
             public void onStart(double timestamp) {
+                mTopLimelight.setLed(Limelight.LedMode.BLINK);
                 mAllLimelights.forEach(limelight -> limelight.setLed(Limelight.LedMode.OFF));
             }
 
@@ -53,12 +54,8 @@ public class LimelightManager extends Subsystem {
                     Limelight limelight;
                     if (mActiveLimelight == ActiveLimelight.TOP) {
                         limelight = mTopLimelight;
-                        //System.out.println("Top limelight is active with a target distance of: " + limelight.getTargetDist());
-                        //System.out.println("Top limelight is active with a offset of: " + limelight.getXOffset());
-
                     } else {
                         limelight = mBottomLimelight;
-                        //System.out.println("Bottom limelight is active with a target distance of: " + limelight.getTargetDist());
                     }
                 }
                 setActiveLimelight();
