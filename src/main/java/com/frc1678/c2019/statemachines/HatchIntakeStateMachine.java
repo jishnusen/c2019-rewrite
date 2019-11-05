@@ -27,7 +27,8 @@ public class HatchIntakeStateMachine {
     private SystemState mSystemState = SystemState.IDLE;
     private double mCurrentStateStartTime = 0;
 
-    private TimeDelayedBoolean mLastSeenHatch = new TimeDelayedBoolean();
+    private TimeDelayedBoolean mLastSeenHatchLeft = new TimeDelayedBoolean();
+    private TimeDelayedBoolean mLastSeenHatchRight = new TimeDelayedBoolean();
     private boolean mDebouncedHatch = false;
 
     public synchronized boolean debouncedHatch() {
@@ -87,10 +88,11 @@ public class HatchIntakeStateMachine {
                 System.out.println(timestamp + ": Intake changed state: " + mSystemState + " -> " + newState);
                 mSystemState = newState;
                 mCurrentStateStartTime = timestamp;
-                mDebouncedHatch = mLastSeenHatch.update(false, kLostHatchTime);
-            } else {
-                mLastSeenHatch.update(currentState.hasHatch(), kLostHatchTime);
             }
+            boolean left_debounced = mLastSeenHatchLeft.update(currentState.leftHatchProxy, kLostHatchTime);
+            boolean right_debounced = mLastSeenHatchRight.update(currentState.rightHatchProxy, kLostHatchTime);
+
+            mDebouncedHatch = left_debounced && right_debounced;
 
             handleTransitions(wantedAction);
         }

@@ -6,6 +6,11 @@ public interface IDriveControlBoard {
     double getTurn();
 
     boolean getQuickTurn();
+    
+    boolean getStartVision();
+
+    boolean getStartVisionPressed();
+
 
     boolean getInterruptAuto();
 }

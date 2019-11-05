@@ -24,7 +24,7 @@ public class SuperstructureConstants {
     
 
     // elevator constants
-    public static double kHatchShipForwardsHeight = 4;
+    public static double kHatchShipForwardsHeight = 5;
     public static double kHatchShipBackwardsHeight = 5;
     public static double kHatchRocketFirstHeight = 0.1;
     public static double kHatchRocketBackwardsHeight = 5;
@@ -50,6 +50,10 @@ public class SuperstructureConstants {
     public static double kElevatorWristHorizHeight = 2;
     public static double kElevatorBoardHeight = 56;
     public static double kElevatorRezeroCurrentThreshold = 3;  // tune
+
+    // Limelight height constants
+
+    public static double kSwitchLimelightHeight = 20; // rough estimate
 
     // wrist constants
     public static double kHatchForwardsAngle = 0.0;

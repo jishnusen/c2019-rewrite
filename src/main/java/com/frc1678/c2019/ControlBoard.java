@@ -36,6 +36,14 @@ public class ControlBoard implements IControlBoard {
     }
 
     @Override
+    public boolean getStartVision() {
+        return mDriveControlBoard.getStartVision();
+    }
+
+    public boolean getStartVisionPressed() {
+        return mDriveControlBoard.getStartVisionPressed();
+    }
+    
     public boolean getInterruptAuto() {
         return mDriveControlBoard.getInterruptAuto();
     }

@@ -11,21 +11,21 @@ import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.auto.AutoModeExecutor;
 import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.paths.TrajectoryGenerator;
+import com.frc1678.c2019.statemachines.*;
 import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
-import com.frc1678.c2019.subsystems.RobotStateEstimator;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
-import com.frc1678.c2019.statemachines.*;
+import com.frc1678.c2019.subsystems.RobotStateEstimator;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.Arrays;
 import java.util.Optional;
+
+
 
 public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
@@ -38,14 +38,13 @@ public class Robot extends TimedRobot {
     private boolean climb_mode = false;
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
-            Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), Superstructure.getInstance(),
+            Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), LimelightManager.getInstance(), Superstructure.getInstance(),
                     HatchIntake.getInstance(), CargoIntake.getInstance(), Wrist.getInstance(), Elevator.getInstance(),
                     Climber.getInstance(), CarriageCanifier.getInstance(), Infrastructure.getInstance()
-            // Limelight.getInstance(),
             ));
 
     private Drive mDrive = Drive.getInstance();
-    // private Limelight mLimelight = Limelight.getInstance();
+    private LimelightManager mLLManager = LimelightManager.getInstance();
     private HatchIntake mHatchIntake = HatchIntake.getInstance();
     private CargoIntake mCargoIntake = CargoIntake.getInstance();
     private Wrist mWrist = Wrist.getInstance();
@@ -196,6 +195,7 @@ public class Robot extends TimedRobot {
             outputToSmartDashboard();
             mElevator.resetIfAtLimit();
             mWrist.resetIfAtLimit();
+            mLLManager.setAllLeds(Limelight.LedMode.OFF);
 
             mAutoModeSelector.updateModeCreator();
             mWantsDriverAuto = mAutoModeSelector.isDriveByCamera();
@@ -232,11 +232,18 @@ public class Robot extends TimedRobot {
 
     private void manualControl() {
         double timestamp = Timer.getFPGATimestamp();
+        boolean vision = mControlBoard.getStartVision();
 
         double throttle = mControlBoard.getThrottle();
         double turn = mControlBoard.getTurn();
 
-        mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
+        if (vision && mLLManager.getHasTarget() && mLLManager.getLimelightOK()) {
+            mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
+        } else {
+            mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
+        }
+       
+        outputToSmartDashboard();
 
         final boolean cargo_preset = mCargoIntake.hasCargo();
         double desired_height = Double.NaN;
@@ -385,6 +392,7 @@ public class Robot extends TimedRobot {
         HatchIntake.getInstance().outputTelemetry();
         Elevator.getInstance().outputTelemetry();
         Infrastructure.getInstance().outputTelemetry();
+        LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         // SmartDashboard.updateValues();
