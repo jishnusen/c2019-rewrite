@@ -1,17 +1,17 @@
 package com.frc1678.c2019.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.states.SuperstructureConstants;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
+import com.team254.lib.drivers.TalonSRXChecker;
+import com.team254.lib.drivers.TalonSRXFactory;
+import com.team254.lib.util.TimeDelayedBoolean;
 import edu.wpi.first.wpilibj.Solenoid;
 
-import com.team254.lib.drivers.TalonSRXFactory;
-import com.team254.lib.drivers.TalonSRXChecker;
-import com.team254.lib.util.TimeDelayedBoolean;
+
 
 public class Climber extends Subsystem {
     public static double kCrawlerVoltage = -12.0;
@@ -117,20 +117,19 @@ public class Climber extends Subsystem {
 
     @Override
     public void writePeriodicOutputs() {
+        
         if (Elevator.getInstance().getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight - 4) {
             mDropSolenoid.set(mPeriodicIO.drop_solenoid);
         } else {
             mDropSolenoid.set(false);
         }
-
-        mForksSolenoid.set(mPeriodicIO.forks_solenoid);
-        if (Elevator.getInstance().getInchesOffGround() <= 5.0) {
+        
+        if (Elevator.getInstance().getInchesOffGround() <= 6.0) {
             mCrawler.set(ControlMode.PercentOutput, mPeriodicIO.crawler_voltage / 12.0);
         } else {
             mCrawler.set(ControlMode.PercentOutput, 0.0);
         }
-        mPinsSolenoid.set(mPeriodicIO.pins_solenoid);
-        mDropSolenoid.set(mPeriodicIO.drop_solenoid);
+
     }
 
     @Override

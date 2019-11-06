@@ -7,8 +7,8 @@
 
 package com.frc1678.c2019;
 
-import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.auto.AutoModeExecutor;
+import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.paths.TrajectoryGenerator;
 import com.frc1678.c2019.statemachines.*;
@@ -309,6 +309,7 @@ public class Robot extends TimedRobot {
             }
         } else {
             mCargoIntake.forceIntakeIn();
+            mHatchIntake.setState(HatchIntakeStateMachine.WantedAction.NONE);
             mCargoIntake.setState(CargoIntake.WantedAction.NONE);
 
             if (mControlBoard.dropCrawlers()) {
