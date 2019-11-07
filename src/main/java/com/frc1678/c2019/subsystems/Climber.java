@@ -124,7 +124,7 @@ public class Climber extends Subsystem {
             mDropSolenoid.set(false);
         }
         
-        if (Elevator.getInstance().getInchesOffGround() <= 6.0) {
+        if (Elevator.getInstance().getInchesOffGround() <= 5.0) {
             mCrawler.set(ControlMode.PercentOutput, mPeriodicIO.crawler_voltage / 12.0);
         } else {
             mCrawler.set(ControlMode.PercentOutput, 0.0);
