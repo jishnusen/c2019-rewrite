@@ -94,7 +94,7 @@ public class Constants {
     public static final int kElevatorRightSlaveId = 7;
     public static final int kElevatorLeftSlaveAId = 8;
     public static final int kElevatorLeftSlaveBId = 9;
-    public static final int kCrawlerId = 13; // TODO set correct number
+    public static final int kCrawlerId = 15; // TODO set correct number
     // Wrist
     public static final int kWristMasterId = 14;
     // Cargo Intake
