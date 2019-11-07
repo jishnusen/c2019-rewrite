@@ -130,6 +130,8 @@ public class Climber extends Subsystem {
             mCrawler.set(ControlMode.PercentOutput, 0.0);
         }
 
+        mPinsSolenoid.set(mPeriodicIO.pins_solenoid);
+
     }
 
     @Override
