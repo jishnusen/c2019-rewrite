@@ -43,7 +43,7 @@ public class SuperstructureConstants {
     public static double kStowHeight = 0.;
     public static double kKissHeight = 55;
     public static double kClimbHeight = 2.0;
-    public static double kCrawlerHeight = 63;
+    public static double kCrawlerHeight = 65;
     public static double kBustDown = 12.3;
     public static double kElevatorPassThroughHeight = 2;
     public static double kElevatorHandoffTolerance = 2e-3;
