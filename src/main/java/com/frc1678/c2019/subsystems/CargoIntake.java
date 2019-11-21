@@ -4,10 +4,12 @@ import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Victor;
 
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.TalonSRXChecker;
@@ -41,13 +43,13 @@ public class CargoIntake extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private CarriageCanifier mCanifier = CarriageCanifier.getInstance();
 
-    private final TalonSRX mMaster;
+    private final VictorSPX mMaster;
     private final Solenoid mPopoutSolenoid;
 
     private CargoIntake() {
         mPopoutSolenoid = Constants.makeSolenoidForId(Constants.kCargoIntakePopoutSolenoidId);
 
-        mMaster = TalonSRXFactory.createDefaultTalon(Constants.kCargoIntakeRollerId);
+        mMaster = new VictorSPX(Constants.kCargoIntakeRollerId);
 
         mMaster.set(ControlMode.PercentOutput, 0);
         mMaster.setInverted(false);
@@ -193,17 +195,7 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        return TalonSRXChecker.CheckTalons(this, new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
-            {
-                add(new TalonSRXChecker.TalonSRXConfig("cargo intake", mMaster));
-            }
-        }, new TalonSRXChecker.CheckerConfig() {
-            {
-                mCurrentFloor = 2;
-                mCurrentEpsilon = 2.0;
-                mRPMSupplier = null;
-            }
-        });
+        return true; // 254 overkill lmao
     }
 
     public static class PeriodicIO {
