@@ -23,12 +23,12 @@ public class MainDriveControlBoard implements IDriveControlBoard {
 
     @Override
     public double getThrottle() {
-        return mThrottleStick.getRawAxis(1);
+        return -mThrottleStick.getRawAxis(1);
     }
 
     @Override
     public double getTurn() {
-        return -mTurnStick.getRawAxis(0);
+        return mTurnStick.getRawAxis(0);
     }
 
     @Override
