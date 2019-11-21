@@ -195,7 +195,7 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        return true; // 254 overkill lmao
+        return true;
     }
 
     public static class PeriodicIO {
