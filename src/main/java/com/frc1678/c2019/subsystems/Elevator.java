@@ -330,7 +330,7 @@ public class Elevator extends Subsystem {
     }
 
     public synchronized void resetIfAtLimit() {
-        if (mPeriodicIO.limit_switch) {
+        if (mPeriodicIO.limit_switch && !mHasBeenZeroed) {
             zeroSensors();
         }
     }
@@ -386,6 +386,7 @@ public class Elevator extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         if (!mHasBeenZeroed) {
                 mMaster.set(ControlMode.PercentOutput, 0.0);
+                return;
         }
 
         if(mElevatorControlState == ElevatorControlState.MOTION_MAGIC) {
