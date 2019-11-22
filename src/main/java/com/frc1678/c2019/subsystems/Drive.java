@@ -302,7 +302,7 @@ public class Drive extends Subsystem {
     public synchronized void setHeading(Rotation2d heading) {
         System.out.println("SET HEADING: " + heading.getDegrees());
 
-        mGyroOffset = heading.rotateBy(Rotation2d.fromDegrees(mPigeon.getFusedHeading()).inverse());
+        mGyroOffset = heading.rotateBy(Rotation2d.fromDegrees(-mPigeon.getFusedHeading()).inverse());
         System.out.println("Gyro offset: " + mGyroOffset.getDegrees());
 
         mPeriodicIO.gyro_heading = heading;
@@ -441,7 +441,7 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_position_ticks = mRightMaster.getSelectedSensorPosition(0);
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
-        mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
+        mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(-mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
         double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / 4096.0) * Math.PI;
         if (deltaLeftTicks > 0.0) {

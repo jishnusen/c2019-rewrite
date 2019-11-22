@@ -36,8 +36,8 @@ public class AutoModeSelector {
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
-        mStartPositionChooser.setDefaultOption("Right", StartingPosition.LEFT_HAB_1);
-        mStartPositionChooser.addOption("Left", StartingPosition.RIGHT_HAB_1);
+        mStartPositionChooser.setDefaultOption("Left", StartingPosition.LEFT_HAB_1);
+        mStartPositionChooser.addOption("Right", StartingPosition.RIGHT_HAB_1);
         SmartDashboard.putData("Starting Position", mStartPositionChooser);
     }
 

@@ -72,15 +72,15 @@ public class TrajectoryGenerator {
     // Origin is the center of the robot when the robot is placed against the middle of the alliance station wall.
     // +x is towards the center of the field.
     // +y is to the left.
-    // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON LEFT! (mirrored about +x axis for RIGHT)
+    // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
     public static final Pose2d kHab1StartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0));
     public static final Pose2d kFarRocketPose = new Pose2d(60.0, 30.0, Rotation2d.fromDegrees(0.0));
 
     public class TrajectorySet {
         public class MirroredTrajectory {
-            public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> left) {
-                this.right = TrajectoryUtil.mirrorTimed(left);
-                this.left = left;
+            public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> right) {
+                this.right = right;
+                this.left = TrajectoryUtil.mirrorTimed(right);
             }
 
             public Trajectory<TimedState<Pose2dWithCurvature>> get(boolean left) {
