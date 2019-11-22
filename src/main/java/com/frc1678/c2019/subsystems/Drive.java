@@ -4,6 +4,7 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.RobotState;
@@ -34,7 +35,8 @@ public class Drive extends Subsystem {
     private static final double DRIVE_ENCODER_PPR = 4096.;
     private static Drive mInstance = new Drive();
     // Hardware
-    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
+    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveB;
+    private final VictorSPX mRightSlaveA, mLeftSlaveA, mRightSlaveB;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
@@ -108,10 +110,10 @@ public class Drive extends Subsystem {
         mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
         configureMaster(mLeftMaster, true);
 
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
-                Constants.kLeftDriveMasterId);
+        mLeftSlaveA = new VictorSPX(Constants.kLeftDriveSlaveAId);
+        mLeftSlaveA.follow(mLeftMaster);
         mLeftSlaveA.setInverted(true);
-
+        
         mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
                 Constants.kLeftDriveMasterId);
         mLeftSlaveB.setInverted(true);
@@ -119,17 +121,17 @@ public class Drive extends Subsystem {
         mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
         configureMaster(mRightMaster, false);
 
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
-                Constants.kRightDriveMasterId);
+        mRightSlaveA = new VictorSPX(Constants.kRightDriveSlaveAId);
+        mRightSlaveA.follow(mRightMaster);
         mRightSlaveA.setInverted(false);
 
-        mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
-                Constants.kRightDriveMasterId);
+        mRightSlaveB = new VictorSPX(Constants.kRightDriveSlaveBId);
+        mRightSlaveB.follow(mRightMaster);
         mRightSlaveB.setInverted(false);
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(mLeftSlaveA);
+        mPigeon = new PigeonIMU(mLeftSlaveB);
         mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -482,7 +484,7 @@ public class Drive extends Subsystem {
                 new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("left_master", mLeftMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
+                        // add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
                         add(new TalonSRXChecker.TalonSRXConfig("left_slave1", mLeftSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
@@ -498,8 +500,8 @@ public class Drive extends Subsystem {
                 new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("right_master", mRightMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
+                        // add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
+                        // add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
