@@ -440,6 +440,7 @@ public class Wrist extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         if (!mHasBeenZeroed) {
             mMaster.set(ControlMode.PercentOutput, 0.0);
+            return;
         }
 
         if (mDesiredState == SystemState.MOTION_PROFILING) {
