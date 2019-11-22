@@ -388,12 +388,12 @@ public class Robot extends TimedRobot {
     public void outputToSmartDashboard() {
         RobotState.getInstance().outputToSmartDashboard();
         // Drive.getInstance().outputTelemetry();
-        Wrist.getInstance().outputTelemetry();
+        // Wrist.getInstance().outputTelemetry();
         // CargoIntake.getInstance().outputTelemetry();
         // HatchIntake.getInstance().outputTelemetry();
         // Elevator.getInstance().outputTelemetry();
         // Infrastructure.getInstance().outputTelemetry();
-        // LimelightManager.getInstance().outputTelemetry();
+        LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         // SmartDashboard.updateValues();
