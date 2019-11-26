@@ -220,6 +220,10 @@ public class Elevator extends Subsystem {
         return mInstance;
     }
 
+    public TalonSRX getPigeonTalon() {
+        return mRightSlave;
+    }
+
     public synchronized void setOpenLoop(double percentage) {
         mElevatorControlState = ElevatorControlState.OPEN_LOOP;
         mPeriodicIO.demand = percentage;
