@@ -24,7 +24,7 @@ public class Constants {
     public static final double kRobotAngularDrag = 12.0;  // N*m / (rad/sec) TODO tune
     public static final double kDriveVIntercept = 1.48;  // V
     public static final double kDriveKv = 0.137;  // V per rad/s
-    public static final double kDriveKa = 0.032;  // V per rad/s^2
+    public static final double kDriveKa = 0.012;  // V per rad/s^2
     public static final double kPathKX = 4.0;  // units/s per unit of error
     public static final double kPathLookaheadTime = 0.4;  // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0;  // inches
