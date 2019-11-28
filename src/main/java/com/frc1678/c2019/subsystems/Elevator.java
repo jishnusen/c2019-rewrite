@@ -3,10 +3,10 @@ package com.frc1678.c2019.subsystems;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.TalonSRXUtil;
@@ -28,8 +28,7 @@ public class Elevator extends Subsystem {
     private static final int kForwardSoftLimit = (int) (71 / kEncoderTicksPerInch); // Encoder ticks.
     private static Elevator mInstance = null;
     //private Intake mIntake = Intake.getInstance();
-    private final TalonSRX mMaster;
-    private final VictorSPX mRightSlave, mLeftSlaveA, mLeftSlaveB;
+    private final TalonSRX mMaster, mRightSlave, mLeftSlaveA, mLeftSlaveB;
     private final Solenoid mShifter;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private ElevatorControlState mElevatorControlState = ElevatorControlState.OPEN_LOOP;
@@ -195,20 +194,22 @@ public class Elevator extends Subsystem {
         mMaster.setInverted(false);
         mMaster.setSensorPhase(false);
 
-        mRightSlave = new VictorSPX(Constants.kElevatorRightSlaveId);
-        mRightSlave.follow(mMaster);
+        mRightSlave = TalonSRXFactory.createPermanentSlaveTalon(Constants.kElevatorRightSlaveId,
+                Constants.kElevatorMasterId);
         mRightSlave.setInverted(false);
 
-        mLeftSlaveA = new VictorSPX(Constants.kElevatorLeftSlaveAId);
-        mLeftSlaveA.follow(mMaster);
+        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kElevatorLeftSlaveAId,
+                Constants.kElevatorMasterId);
         mLeftSlaveA.setInverted(false);
 
-        mLeftSlaveB = new VictorSPX(Constants.kElevatorLeftSlaveBId);
-        mLeftSlaveB.follow(mMaster);
+        mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kElevatorLeftSlaveBId,
+                Constants.kElevatorMasterId);
         mLeftSlaveB.setInverted(false);
 
         mShifter = Constants.makeSolenoidForId(Constants.kElevatorShifterSolenoidId);
         mShifter.set(false);
+
+        mRightSlave.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         // Start with zero power.
         mMaster.set(ControlMode.PercentOutput, 0);
@@ -220,6 +221,10 @@ public class Elevator extends Subsystem {
             mInstance = new Elevator();
         }
         return mInstance;
+    }
+
+    public TalonSRX getPigeonTalon() {
+        return mRightSlave;
     }
 
     public synchronized void setOpenLoop(double percentage) {
@@ -407,15 +412,16 @@ public class Elevator extends Subsystem {
         setHangMode(true);
 
         boolean leftSide =
-                TalonSRXChecker.CheckTalons(this,
-                        new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
-                            {
-                                /* add(new TalonSRXChecker.TalonSRXConfig("left_slave_a",
+                TalonSRXChecker.checkMotors(this,
+                new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                            private static final long serialVersionUID = -2218871869023990636L;
+			    {
+                                add(new MotorChecker.MotorConfig<TalonSRX>("left_slave_a",
                                         mLeftSlaveA));
-                                add(new TalonSRXChecker.TalonSRXConfig("left_slave_b",
-                                        mLeftSlaveB)); */
+                                add(new  MotorChecker.MotorConfig<TalonSRX>("left_slave_b",
+                                        mLeftSlaveB));
                             }
-                        }, new TalonSRXChecker.CheckerConfig() {
+                        }, new MotorChecker.CheckerConfig() {
                             {
                                 mCurrentFloor = 2;
                                 mRPMFloor = 200;
@@ -427,11 +433,12 @@ public class Elevator extends Subsystem {
                             }
                         });
         boolean rightSide =
-                TalonSRXChecker.CheckTalons(this,
-                        new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
-                            {
-                                add(new TalonSRXChecker.TalonSRXConfig("master", mMaster));
-                                // add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlave));
+                TalonSRXChecker.checkMotors(this,
+                new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                           private static final long serialVersionUID = 3746808535371453536L;
+                           {
+                                add(new MotorChecker.MotorConfig<TalonSRX>("master", mMaster));
+                                add(new MotorChecker.MotorConfig<TalonSRX>("right_slave", mRightSlave));
                             }
                         }, new TalonSRXChecker.CheckerConfig() {
                             {

@@ -1,5 +1,7 @@
 package com.team254.lib.util;
 
+import com.frc1678.c2019.subsystems.Drive;
+
 /**
  * Helper class to implement "Cheesy Drive". "Cheesy Drive" simply means that the "turning" stick controls the curvature
  * of the robot's path rather than its rate of heading change. This helps make the robot more controllable at high
@@ -7,27 +9,28 @@ package com.team254.lib.util;
  * turn-in-place maneuvers.
  */
 public class CheesyDriveHelper {
-
-    private static final double kThrottleDeadband = 0.02;
+    private static final double kThrottleDeadband = 0.035;
     private static final double kWheelDeadband = 0.02;
 
     // These factor determine how fast the wheel traverses the "non linear" sine curve.
-    private static final double kHighWheelNonLinearity = 0.65;
+    private static final double kHighWheelNonLinearity = 0.01;
     private static final double kLowWheelNonLinearity = 0.5;
 
-    private static final double kHighNegInertiaScalar = 4.0;
+    private static final double kHighNegInertiaScalar = 0.0;
 
     private static final double kLowNegInertiaThreshold = 0.65;
-    private static final double kLowNegInertiaTurnScalar = 3.5;
-    private static final double kLowNegInertiaCloseScalar = 4.0;
-    private static final double kLowNegInertiaFarScalar = 5.0;
+    private static final double kLowNegInertiaTurnScalar = 3.0;
+    private static final double kLowNegInertiaCloseScalar = 3.0;
+    private static final double kLowNegInertiaFarScalar = 4.0;
 
-    private static final double kHighSensitivity = 0.65;
-    private static final double kLowSensitiity = 0.65;
+    private static final double kHighSensitivity = 0.6;
+    private static final double kLowSensitiity = 0.625;
+
+    private static final double kWheelQuckTurnScalar = .65;
 
     private static final double kQuickStopDeadband = 0.5;
-    private static final double kQuickStopWeight = 0.1;
-    private static final double kQuickStopScalar = 5.0;
+    private static final double kQuickStopWeight = 0.125;
+    private static final double kQuickStopScalar = 2.8;
 
     private double mOldWheel = 0.0;
     private double mQuickStopAccumlator = 0.0;
@@ -104,7 +107,7 @@ public class CheesyDriveHelper {
                         + alpha * Util.limit(wheel, 1.0) * kQuickStopScalar;
             }
             overPower = 1.0;
-            angularPower = wheel;
+            angularPower = wheel * kWheelQuckTurnScalar;
         } else {
             overPower = 0.0;
             angularPower = Math.abs(throttle) * wheel * sensitivity - mQuickStopAccumlator;
@@ -135,6 +138,10 @@ public class CheesyDriveHelper {
             rightPwm = -1.0;
         }
         return new DriveSignal(leftPwm, rightPwm);
+    }
+
+    public DriveSignal cheesyDrive(double throttle, double wheel, boolean isQuickTurn) {
+        return cheesyDrive(throttle, wheel, isQuickTurn);
     }
 
     public double handleDeadband(double val, double deadband) {
