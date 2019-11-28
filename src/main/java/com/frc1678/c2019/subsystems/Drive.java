@@ -132,7 +132,8 @@ public class Drive extends Subsystem {
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(Elevator.getInstance().getPigeonTalon());
+        mPigeon = new PigeonIMU(mLeftSlaveB);
+        mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
