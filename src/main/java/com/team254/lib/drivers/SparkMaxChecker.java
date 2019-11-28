@@ -2,7 +2,7 @@ package com.team254.lib.drivers;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.team254.frc2019.subsystems.Subsystem;
+import com.frc1678.c2019.subsystems.Subsystem;
 
 import java.util.ArrayList;
 

@@ -28,6 +28,7 @@ public class Constants {
     public static final double kPathKX = 4.0;  // units/s per unit of error
     public static final double kPathLookaheadTime = 0.4;  // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0;  // inches
+    public static final double kPathFollowingMaxAccel = 80.0;  // inches per second ^ 2
     // PID gains for drive velocity loop 
     // Units: setpoint, error, and output are in ticks per second.
     public static final double kDriveVelocityKp = 0.9;

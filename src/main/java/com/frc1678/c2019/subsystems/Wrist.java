@@ -12,6 +12,7 @@ import com.frc1678.c2019.states.SuperstructureConstants;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.TalonSRXUtil;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -458,11 +459,12 @@ public class Wrist extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        return TalonSRXChecker.CheckTalons(this, new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        return TalonSRXChecker.checkMotors(this,  new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+            private static final long serialVersionUID = 2555581143886197844L;
             {
-                add(new TalonSRXChecker.TalonSRXConfig("wrist_master", mMaster));
+                add(new MotorChecker.MotorConfig<>("wrist_master", mMaster));
             }
-        }, new TalonSRXChecker.CheckerConfig() {
+        }, new MotorChecker.CheckerConfig() {
             {
                 mRunTimeSec = 1.0;
                 mRunOutputPercentage = 0.20;

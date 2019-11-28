@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.TalonSRXUtil;
@@ -411,15 +412,17 @@ public class Elevator extends Subsystem {
         setHangMode(true);
 
         boolean leftSide =
-                TalonSRXChecker.CheckTalons(this,
-                        new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+                TalonSRXChecker.checkMotors(this,
+                new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                        private static final long serialVersionUID = 2555581143886197844L;
+    
                             {
-                                add(new TalonSRXChecker.TalonSRXConfig("left_slave_a",
+                                add(new MotorChecker.MotorConfig<TalonSRX>("left_slave_a",
                                         mLeftSlaveA));
-                                add(new TalonSRXChecker.TalonSRXConfig("left_slave_b",
+                                add(new  MotorChecker.MotorConfig<TalonSRX>("left_slave_b",
                                         mLeftSlaveB));
                             }
-                        }, new TalonSRXChecker.CheckerConfig() {
+                        }, new MotorChecker.CheckerConfig() {
                             {
                                 mCurrentFloor = 2;
                                 mRPMFloor = 200;
@@ -431,11 +434,12 @@ public class Elevator extends Subsystem {
                             }
                         });
         boolean rightSide =
-                TalonSRXChecker.CheckTalons(this,
-                        new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        TalonSRXChecker.checkMotors(this,
+        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                private static final long serialVersionUID = 2555581143886197844L;
                             {
-                                add(new TalonSRXChecker.TalonSRXConfig("master", mMaster));
-                                add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlave));
+                                add(new MotorChecker.MotorConfig<TalonSRX>("master", mMaster));
+                                add(new MotorChecker.MotorConfig<TalonSRX>("right_slave", mRightSlave));
                             }
                         }, new TalonSRXChecker.CheckerConfig() {
                             {
