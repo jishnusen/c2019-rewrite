@@ -118,13 +118,13 @@ public class Climber extends Subsystem {
     @Override
     public void writePeriodicOutputs() {
         
-        if (Elevator.getInstance().getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight - 2) {
+        if (Elevator.getInstance().getPosition() >= SuperstructureConstants.kCrawlerHeight - 2) {
             mDropSolenoid.set(mPeriodicIO.drop_solenoid);
         } else {
             mDropSolenoid.set(false);
         }
         
-        if (Elevator.getInstance().getInchesOffGround() <= 5.0) {
+        if (Elevator.getInstance().getPosition() <= 5.0) {
             mCrawler.set(ControlMode.PercentOutput, mPeriodicIO.crawler_voltage / 12.0);
         } else {
             mCrawler.set(ControlMode.PercentOutput, 0.0);

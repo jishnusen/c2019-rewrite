@@ -53,15 +53,18 @@ public class Constants {
           kElevatorConstants.kMasterConstants.id = 6;
           kElevatorConstants.kMasterConstants.invert_motor = false;
           kElevatorConstants.kMasterConstants.invert_sensor_phase = false;
-          kElevatorConstants.kSlaveConstants = new TalonSRXConstants[2];
+          kElevatorConstants.kSlaveConstants = new TalonSRXConstants[3];
   
           kElevatorConstants.kSlaveConstants[0] = new TalonSRXConstants();
           kElevatorConstants.kSlaveConstants[1] = new TalonSRXConstants();
+          kElevatorConstants.kSlaveConstants[2] = new TalonSRXConstants();
   
           kElevatorConstants.kSlaveConstants[0].id = 7;
           kElevatorConstants.kSlaveConstants[0].invert_motor = false;
           kElevatorConstants.kSlaveConstants[1].id = 8;
           kElevatorConstants.kSlaveConstants[1].invert_motor = false;
+          kElevatorConstants.kSlaveConstants[2].id = 9;
+          kElevatorConstants.kSlaveConstants[3].invert_motor = false;
   
           // Unit == Inches
           kElevatorConstants.kHomePosition = 0.0;  // Inches off ground
