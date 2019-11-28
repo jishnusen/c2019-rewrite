@@ -211,8 +211,6 @@ public class Elevator extends Subsystem {
         mShifter = Constants.makeSolenoidForId(Constants.kElevatorShifterSolenoidId);
         mShifter.set(false);
 
-        mRightSlave.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
-
         // Start with zero power.
         mMaster.set(ControlMode.PercentOutput, 0);
         setNeutralMode(NeutralMode.Brake);
@@ -223,10 +221,6 @@ public class Elevator extends Subsystem {
             mInstance = new Elevator();
         }
         return mInstance;
-    }
-
-    public TalonSRX getPigeonTalon() {
-        return mRightSlave;
     }
 
     public synchronized void setOpenLoop(double percentage) {
