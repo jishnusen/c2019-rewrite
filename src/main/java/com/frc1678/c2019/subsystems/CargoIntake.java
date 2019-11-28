@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 
 import com.team254.lib.drivers.TalonSRXFactory;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
 
@@ -193,11 +194,12 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        return TalonSRXChecker.CheckTalons(this, new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        return TalonSRXChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+            private static final long serialVersionUID = 8343060678848936021L;
             {
-                add(new TalonSRXChecker.TalonSRXConfig("cargo intake", mMaster));
+                add(new MotorChecker.MotorConfig<>("cargo intake", mMaster));
             }
-        }, new TalonSRXChecker.CheckerConfig() {
+        }, new MotorChecker.CheckerConfig() {
             {
                 mCurrentFloor = 2;
                 mCurrentEpsilon = 2.0;

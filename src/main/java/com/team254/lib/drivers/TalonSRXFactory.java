@@ -3,7 +3,6 @@ package com.team254.lib.drivers;
 import com.ctre.phoenix.ParamEnum;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Talon;
 
 /**
  * Creates CANTalon objects and configures all the parameters we care about to factory defaults. Closed-loop and sensor
@@ -15,11 +14,11 @@ public class TalonSRXFactory {
 
     public static class Configuration {
         public NeutralMode NEUTRAL_MODE = NeutralMode.Coast;
-        // This is factory default.
+        // factory default
         public double NEUTRAL_DEADBAND = 0.04;
 
         public boolean ENABLE_CURRENT_LIMIT = false;
-        public boolean ENABLE_SOFT_LIMIT = false;
+        public boolean ENABLE_SOFT_LIMIT = true;
         public boolean ENABLE_LIMIT_SWITCH = false;
         public int FORWARD_SOFT_LIMIT = 0;
         public int REVERSE_SOFT_LIMIT = 0;
@@ -31,9 +30,9 @@ public class TalonSRXFactory {
         public int MOTION_CONTROL_FRAME_PERIOD_MS = 100;
         public int GENERAL_STATUS_FRAME_RATE_MS = 5;
         public int FEEDBACK_STATUS_FRAME_RATE_MS = 100;
-        public int QUAD_ENCODER_STATUS_FRAME_RATE_MS = 100;
-        public int ANALOG_TEMP_VBAT_STATUS_FRAME_RATE_MS = 100;
-        public int PULSE_WIDTH_STATUS_FRAME_RATE_MS = 100;
+        public int QUAD_ENCODER_STATUS_FRAME_RATE_MS = 1000;
+        public int ANALOG_TEMP_VBAT_STATUS_FRAME_RATE_MS = 1000;
+        public int PULSE_WIDTH_STATUS_FRAME_RATE_MS = 1000;
 
         public VelocityMeasPeriod VELOCITY_MEASUREMENT_PERIOD = VelocityMeasPeriod.Period_100Ms;
         public int VELOCITY_MEASUREMENT_ROLLING_AVERAGE_WINDOW = 64;
@@ -47,7 +46,7 @@ public class TalonSRXFactory {
 
     static {
         // This control frame value seems to need to be something reasonable to avoid the Talon's
-        // LEDs behaving erratically.  Potentially try to increase as much as possible.
+        // LEDs behaving erratically. Potentially try to increase as much as possible.
         kSlaveConfiguration.CONTROL_FRAME_PERIOD_MS = 100;
         kSlaveConfiguration.MOTION_CONTROL_FRAME_PERIOD_MS = 1000;
         kSlaveConfiguration.GENERAL_STATUS_FRAME_RATE_MS = 1000;
@@ -55,13 +54,12 @@ public class TalonSRXFactory {
         kSlaveConfiguration.QUAD_ENCODER_STATUS_FRAME_RATE_MS = 1000;
         kSlaveConfiguration.ANALOG_TEMP_VBAT_STATUS_FRAME_RATE_MS = 1000;
         kSlaveConfiguration.PULSE_WIDTH_STATUS_FRAME_RATE_MS = 1000;
+        kSlaveConfiguration.ENABLE_SOFT_LIMIT = false;
     }
 
-    // Create a CANTalon with the default (out of the box) configuration.
+    // create a CANTalon with the default (out of the box) configuration
     public static TalonSRX createDefaultTalon(int id) {
-        final TalonSRX talon = new LazyTalonSRX(id);
-        talon.configFactoryDefault();
-        return talon;
+        return createTalon(id, kDefaultConfiguration);
     }
 
     public static TalonSRX createPermanentSlaveTalon(int id, int master_id) {
@@ -81,9 +79,9 @@ public class TalonSRXFactory {
         talon.clearStickyFaults(kTimeoutMs);
 
         talon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
-                LimitSwitchNormal.NormallyOpen, kTimeoutMs);
+                LimitSwitchNormal.Disabled, kTimeoutMs);
         talon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
-                LimitSwitchNormal.NormallyOpen, kTimeoutMs);
+                LimitSwitchNormal.Disabled, kTimeoutMs);
         talon.overrideLimitSwitchesEnable(config.ENABLE_LIMIT_SWITCH);
 
         // Turn off re-zeroing by default.

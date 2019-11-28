@@ -13,6 +13,7 @@ import com.frc1678.c2019.planners.DriveMotionPlanner;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.lib.control.PIDController;
 import com.team254.lib.drivers.TalonSRXChecker;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
@@ -41,6 +42,7 @@ public class Drive extends Subsystem {
     // Hardware states
     private PeriodicIO mPeriodicIO;
     private boolean mIsBrakeMode;
+    public final boolean isHighGear = false;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
@@ -477,12 +479,13 @@ public class Drive extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        boolean leftSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        boolean leftSide = TalonSRXChecker.checkMotors(this,
+        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                    private static final long serialVersionUID = 4715363468641125563L;
                     {
-                        add(new TalonSRXChecker.TalonSRXConfig("left_master", mLeftMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave1", mLeftSlaveB));
+                        add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
+                        add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
+                        add(new MotorChecker.MotorConfig<>("left_slave1", mLeftSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
@@ -493,12 +496,13 @@ public class Drive extends Subsystem {
                         mRPMSupplier = () -> mLeftMaster.getSelectedSensorVelocity(0);
                     }
                 });
-        boolean rightSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        boolean rightSide = TalonSRXChecker.checkMotors(this,
+        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                    private static final long serialVersionUID = 8979637825679409635L;
                     {
-                        add(new TalonSRXChecker.TalonSRXConfig("right_master", mRightMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
+                        add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
+                        add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
+                        add(new MotorChecker.MotorConfig<>("right_slave1", mRightSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
