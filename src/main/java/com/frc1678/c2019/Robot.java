@@ -151,7 +151,7 @@ public class Robot extends TimedRobot {
             }
 
             mInfrastructure.setIsDuringAuto(false);
-            mWrist.setRampRate(Constants.kWristRampRate);
+            mWrist.setRampRate(Constants.kWristConstants.kRampRate);
 
             RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mEnabledLooper.start();

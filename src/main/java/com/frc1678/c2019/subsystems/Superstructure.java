@@ -103,9 +103,9 @@ public class Superstructure extends Subsystem {
             mElevator.setHangMode(false);
         }
         if(isWristJogging) {
-            mWrist.setPositionPIDAngle(commandState.wristAngle);
+            mWrist.setSetpointPositionPID(commandState.wristAngle, 0.0);
         } else {
-            mWrist.setMotionProfileAngle(commandState.wristAngle);
+            mWrist.setSetpointMotionMagic(commandState.wristAngle);
         }
     }
 
