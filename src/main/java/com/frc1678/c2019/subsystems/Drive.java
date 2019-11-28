@@ -44,6 +44,7 @@ public class Drive extends Subsystem {
     // Hardware states
     private PeriodicIO mPeriodicIO;
     private boolean mIsBrakeMode;
+    public final boolean isHighGear = false;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
