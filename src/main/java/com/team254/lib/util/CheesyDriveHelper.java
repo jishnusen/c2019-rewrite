@@ -141,7 +141,7 @@ public class CheesyDriveHelper {
     }
 
     public DriveSignal cheesyDrive(double throttle, double wheel, boolean isQuickTurn) {
-        return cheesyDrive(throttle, wheel, isQuickTurn);
+        return cheesyDrive(throttle, wheel, isQuickTurn, Drive.getInstance().isHighGear);
     }
 
     public double handleDeadband(double val, double deadband) {
