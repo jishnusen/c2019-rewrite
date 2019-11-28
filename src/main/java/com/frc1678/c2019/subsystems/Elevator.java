@@ -414,9 +414,8 @@ public class Elevator extends Subsystem {
         boolean leftSide =
                 TalonSRXChecker.checkMotors(this,
                 new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-                        private static final long serialVersionUID = 2555581143886197844L;
-    
-                            {
+                            private static final long serialVersionUID = -2218871869023990636L;
+			    {
                                 add(new MotorChecker.MotorConfig<TalonSRX>("left_slave_a",
                                         mLeftSlaveA));
                                 add(new  MotorChecker.MotorConfig<TalonSRX>("left_slave_b",
@@ -434,10 +433,10 @@ public class Elevator extends Subsystem {
                             }
                         });
         boolean rightSide =
-        TalonSRXChecker.checkMotors(this,
-        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-                private static final long serialVersionUID = 2555581143886197844L;
-                            {
+                TalonSRXChecker.checkMotors(this,
+                new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                           private static final long serialVersionUID = 3746808535371453536L;
+                           {
                                 add(new MotorChecker.MotorConfig<TalonSRX>("master", mMaster));
                                 add(new MotorChecker.MotorConfig<TalonSRX>("right_slave", mRightSlave));
                             }

@@ -480,7 +480,7 @@ public class Drive extends Subsystem {
     public boolean checkSystem() {
         boolean leftSide = TalonSRXChecker.checkMotors(this,
         new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-            private static final long serialVersionUID = 2555581143886197844L;
+                    private static final long serialVersionUID = 4715363468641125563L;
                     {
                         add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
                         add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
@@ -497,7 +497,7 @@ public class Drive extends Subsystem {
                 });
         boolean rightSide = TalonSRXChecker.checkMotors(this,
         new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-            private static final long serialVersionUID = 2555581143886197844L;
+                    private static final long serialVersionUID = 8979637825679409635L;
                     {
                         add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
                         add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));

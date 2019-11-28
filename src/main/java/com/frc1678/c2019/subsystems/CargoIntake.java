@@ -195,7 +195,7 @@ public class CargoIntake extends Subsystem {
     @Override
     public boolean checkSystem() {
         return TalonSRXChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-            private static final long serialVersionUID = 2555581143886197844L;
+            private static final long serialVersionUID = 8343060678848936021L;
             {
                 add(new MotorChecker.MotorConfig<>("cargo intake", mMaster));
             }

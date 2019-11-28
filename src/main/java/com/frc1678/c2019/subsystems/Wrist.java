@@ -460,7 +460,7 @@ public class Wrist extends Subsystem {
     @Override
     public boolean checkSystem() {
         return TalonSRXChecker.checkMotors(this,  new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
-            private static final long serialVersionUID = 2555581143886197844L;
+            private static final long serialVersionUID = 7928434738232966358L;
             {
                 add(new MotorChecker.MotorConfig<>("wrist_master", mMaster));
             }
