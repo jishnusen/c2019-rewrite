@@ -123,6 +123,11 @@ public class Constants {
 
     // Limelight
 
+    public static final double kMaxTrackerDistance = 9.0;
+    public static final double kMaxGoalTrackAge = 2.5;
+    public static final double kMaxGoalTrackSmoothingTime = 0.5;
+    public static final double kCameraFrameRate = 90.0;
+
     public static final LLConstants kTopLimelightConstants = new LLConstants();
     static {
         kTopLimelightConstants.kName = "Front Limelight";
