@@ -16,17 +16,17 @@ public class Constants {
     public static final double kLooperDt = 0.01;
     /* ROBOT PHYSICAL CONSTANTS */
     // Wheels
-    public static final double kDriveWheelTrackWidthInches = 27.47;
+    public static final double kDriveWheelTrackWidthInches = 27.75;
     public static final double kDriveWheelDiameterInches = 4.0;
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kTrackScrubFactor = 1.0;  // Tune me!
     // Tuned dynamics
-    public static final double kRobotLinearInertia = 63.0;  // kg TODO tune
-    public static final double kRobotAngularInertia = 13.3;  // kg m^2 TODO tune
+    public static final double kRobotLinearInertia = 60.0;  // kg TODO tune
+    public static final double kRobotAngularInertia = 10.0;  // kg m^2 TODO tune
     public static final double kRobotAngularDrag = 12.0;  // N*m / (rad/sec) TODO tune
-    public static final double kDriveVIntercept = 1.33;  // V
-    public static final double kDriveKv = 0.135;  // V per rad/s
-    public static final double kDriveKa = 0.012;  // V per rad/s^2
+    public static final double kDriveVIntercept = 1.48;  // V
+    public static final double kDriveKv = 0.137;  // V per rad/s
+    public static final double kDriveKa = 0.032;  // V per rad/s^2
     public static final double kPathKX = 4.0;  // units/s per unit of error
     public static final double kPathLookaheadTime = 0.4;  // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0;  // inches
