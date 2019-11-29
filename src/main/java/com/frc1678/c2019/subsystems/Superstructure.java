@@ -98,10 +98,10 @@ public class Superstructure extends Subsystem {
             }
         }
         if(isWristJogging) {
-            mWrist.setSetpointPositionPID(commandState.wristAngle, 0.0); // ff_v temporarily 0
-        } else {
-            mWrist.setSetpointMotionMagic(commandState.wristAngle);
-        }
+                mWrist.setPositionPIDAngle(commandState.wristAngle);
+            } else {
+                mWrist.setMotionProfileAngle(commandState.wristAngle);
+                }
     }
 
     @Override

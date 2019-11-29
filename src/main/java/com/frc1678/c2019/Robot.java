@@ -151,7 +151,7 @@ public class Robot extends TimedRobot {
             }
 
             mInfrastructure.setIsDuringAuto(false);
-            mWrist.setRampRate(Constants.kWristConstants.kRampRate);
+            mWrist.setRampRate(Constants.kWristRampRate);
 
             RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mEnabledLooper.start();
@@ -391,7 +391,7 @@ public class Robot extends TimedRobot {
         Wrist.getInstance().outputTelemetry();
         //CargoIntake.getInstance().outputTelemetry();
         //HatchIntake.getInstance().outputTelemetry();
-        //Elevator.getInstance().outputTelemetry();
+        Elevator.getInstance().outputTelemetry();
         //Infrastructure.getInstance().outputTelemetry();
         //LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();

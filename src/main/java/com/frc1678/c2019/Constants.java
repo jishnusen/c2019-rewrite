@@ -64,7 +64,7 @@ public class Constants {
           kElevatorConstants.kSlaveConstants[1].id = 8;
           kElevatorConstants.kSlaveConstants[1].invert_motor = false;
           kElevatorConstants.kSlaveConstants[2].id = 9;
-          kElevatorConstants.kSlaveConstants[3].invert_motor = false;
+          kElevatorConstants.kSlaveConstants[2].invert_motor = false;
   
           // Unit == Inches
           kElevatorConstants.kHomePosition = 0.0;  // Inches off ground
@@ -99,43 +99,26 @@ public class Constants {
     // wrist
     public static final double kAutoWristRampRate = 0.01;
 
-    public static final ServoMotorSubsystemConstants kWristConstants = new ServoMotorSubsystemConstants();
-    static {
-        kWristConstants.kName = "Wrist";
-
-        kWristConstants.kMasterConstants.id = 14;
-        kWristConstants.kMasterConstants.invert_motor = false;
-        kWristConstants.kMasterConstants.invert_sensor_phase = false;
-
-        // Unit == Degrees
-        kWristConstants.kHomePosition = 0.0;  // Degrees
-        kWristConstants.kTicksPerUnitDistance = (4096 * 2.933) / (180.0);
-        kWristConstants.kKp = 1.0;
-        kWristConstants.kKi = 0;
-        kWristConstants.kKd = 20.0;
-        kWristConstants.kKf = 0.3;
-        kWristConstants.kMaxIntegralAccumulator = 500000;
-        kWristConstants.kIZone = 500; // Ticks
-        kWristConstants.kDeadband = 5; // Ticks
-
-        kWristConstants.kPositionKp = 2.0;
-        kWristConstants.kPositionKi = 0;
-        kWristConstants.kPositionKd = 40.0;
-        kWristConstants.kPositionKf = 0.0;
-        kWristConstants.kPositionMaxIntegralAccumulator = 0;
-        kWristConstants.kPositionIZone = 0; // Ticks
-        kWristConstants.kPositionDeadband = 0; // Ticks
-
-        kWristConstants.kMinUnitsLimit = -7;
-        kWristConstants.kMaxUnitsLimit = 190.0;
-
-        kWristConstants.kCruiseVelocity = 2500; // Ticks / 100ms
-        kWristConstants.kAcceleration = 2500; // Ticks / 100ms / s
-        kWristConstants.kRampRate = 0.001; // s
-        kWristConstants.kContinuousCurrentLimit = 20; // amps
-        kWristConstants.kPeakCurrentLimit = 40; // amps
-        kWristConstants.kPeakCurrentDuration = 200; // milliseconds
-    }
+    // wrist
+    // PID gains for wrist velocity loop
+    public static final double kWristKp = 1.0;
+    public static final double kWristKi = 0.0;
+    public static final double kWristKd = 20.0;
+    public static final double kWristKf = 0.3;
+    public static final double kWristJogKp = 2.0;
+    public static final double kWristJogKd = 40.0;
+    public static final double kWristKaWithCube = 0.006;
+    public static final double kWristKaWithoutCube = 0.003;
+    public static final double kWristKfMultiplierEmpty = 0.1275;
+    public static final double kWristElevatorAccelerationMultiplier = -1.0;
+    public static final double kWristEpsilon = 2.0;
+    public static final int kWristMaxIntegralAccumulator = 500000; //todo: tune me
+    public static final int kWristIZone = 500; //todo: tune me
+    public static final int kWristDeadband = 5; //todo: tune me
+    public static final int kWristCruiseVelocity = 2500; //todo: tune me
+    public static final int kWristAcceleration = 2500; //2000 //todo: tune me
+    public static final double kWristRampRate = 0.001;
+    public static final int kWristMasterId = 14;
     /* I/O */
     // (Note that if multiple talons are dedicated to a mechanism, any sensors
     // are attached to the master)
