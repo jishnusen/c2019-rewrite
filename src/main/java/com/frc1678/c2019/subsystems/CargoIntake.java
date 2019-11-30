@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.MotorChecker;
+import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
 
@@ -45,6 +46,8 @@ public class CargoIntake extends Subsystem {
     private final TalonSRX mMaster;
     private final Solenoid mPopoutSolenoid;
 
+    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
+
     private CargoIntake() {
         mPopoutSolenoid = Constants.makeSolenoidForId(Constants.kCargoIntakePopoutSolenoidId);
 
@@ -67,6 +70,9 @@ public class CargoIntake extends Subsystem {
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean("CargoProxy", mPeriodicIO.has_cargo);
         SmartDashboard.putNumber("MotorSetpoint", mPeriodicIO.demand);
+        if (mCSVWriter != null) {
+            mCSVWriter.write();
+        }
     }
 
     @Override
@@ -85,6 +91,7 @@ public class CargoIntake extends Subsystem {
             public void onStart(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
+                // startLogging();
             }
 
             @Override
@@ -103,6 +110,7 @@ public class CargoIntake extends Subsystem {
             public void onStop(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
+                stopLogging();
             }
         });
     }
@@ -178,9 +186,14 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
+        mPeriodicIO.current = mMaster.getOutputCurrent();
         mDebouncedCargo = mLastSeenCargo.update(mCanifier.getCargoProxy(), 0.1);
         mPeriodicIO.has_cargo = mDebouncedCargo;
         mPeriodicIO.cargo_proxy = mCanifier.getCargoProxy();
+
+        if (mCSVWriter != null) {
+            mCSVWriter.add(mPeriodicIO);
+        }
     }
 
     @Override
@@ -208,8 +221,22 @@ public class CargoIntake extends Subsystem {
         });
     }
 
+    public synchronized void startLogging() {
+        if (mCSVWriter == null) {
+            mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/CARGOINTAKE-LOGS.csv", PeriodicIO.class);
+        }
+    }
+
+    public synchronized void stopLogging() {
+        if (mCSVWriter != null) {
+            mCSVWriter.flush();
+            mCSVWriter = null;
+        }
+    }
+
     public static class PeriodicIO {
         // INPUTS
+        public double current;
         public boolean has_cargo;
         public boolean cargo_proxy;
 
