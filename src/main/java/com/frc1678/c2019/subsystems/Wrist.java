@@ -195,6 +195,7 @@ public class Wrist extends Subsystem {
         SmartDashboard.putNumber("Wrist Ticks", mPeriodicIO.position_ticks);
         SmartDashboard.putNumber("Wrist periodic demand", mPeriodicIO.demand);
         SmartDashboard.putBoolean("LIMR", mPeriodicIO.limit_switch);
+        SmartDashboard.putNumber("Wrist Current", mPeriodicIO.current);
 
         SmartDashboard.putBoolean("Zero wrist", mHasBeenZeroed);
 
