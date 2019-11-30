@@ -55,6 +55,8 @@ public class CargoIntake extends Subsystem {
 
         mMaster.set(ControlMode.PercentOutput, 0);
         mMaster.setInverted(false);
+        mMaster.configForwardSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
+        mMaster.configReverseSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
     }
