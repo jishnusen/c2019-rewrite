@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Victor;
 
 import com.team254.lib.drivers.TalonSRXFactory;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
 

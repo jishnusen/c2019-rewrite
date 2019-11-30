@@ -14,8 +14,8 @@ public class CollectAccelerationData implements Action {
     private static final double kTotalTime = 2.0; //how long to run the test for
     private static final Drive mDrive = Drive.getInstance();
 
-    private final ReflectingCSVWriter<DriveCharacterization.AccelerationDataPoint> mCSVWriter;
-    private final List<DriveCharacterization.AccelerationDataPoint> mAccelerationData;
+    private final ReflectingCSVWriter<DriveCharacterization.DataPoint> mCSVWriter;
+    private final List<DriveCharacterization.DataPoint> mAccelerationData;
     private final boolean mTurn;
     private final boolean mReverse;
 
@@ -29,11 +29,11 @@ public class CollectAccelerationData implements Action {
      * @param turn if true turn, if false drive straight
      *
      */
-    public CollectAccelerationData(List<DriveCharacterization.AccelerationDataPoint> data, boolean reverse, boolean turn) {
+    public CollectAccelerationData(List<DriveCharacterization.DataPoint> data, boolean reverse, boolean turn) {
         mAccelerationData = data;
         mReverse = reverse;
         mTurn = turn;
-        mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/ACCEL_DATA.csv", DriveCharacterization.AccelerationDataPoint.class);
+        mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/ACCEL_DATA.csv", DriveCharacterization.DataPoint.class);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CollectAccelerationData implements Action {
             return;
         }
 
-        mAccelerationData.add(new DriveCharacterization.AccelerationDataPoint(
+        mAccelerationData.add(new DriveCharacterization.DataPoint(
                 currentVelocity, //convert to radians per second
                 kPower * 12.0, //convert to volts
                 acceleration

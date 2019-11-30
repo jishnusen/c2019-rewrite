@@ -20,8 +20,8 @@ public class CharacterizeDrivebaseMode extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        List<DriveCharacterization.VelocityDataPoint> velocityData = new ArrayList<>();
-        List<DriveCharacterization.AccelerationDataPoint> accelerationData = new ArrayList<>();
+        List<DriveCharacterization.DataPoint> velocityData = new ArrayList<>();
+        List<DriveCharacterization.DataPoint> accelerationData = new ArrayList<>();
 
         runAction(new CollectVelocityData(velocityData, reverse, turn));
         runAction(new WaitAction(10));
