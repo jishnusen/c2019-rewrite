@@ -322,6 +322,9 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
 
+        SmartDashboard.putNumber("Left Current", mPeriodicIO.left_current);
+        SmartDashboard.putNumber("Right Current", mPeriodicIO.right_current);
+
         SmartDashboard.putNumber("x err", mPeriodicIO.error.getTranslation().x());
         SmartDashboard.putNumber("y err", mPeriodicIO.error.getTranslation().y());
         SmartDashboard.putNumber("theta err", mPeriodicIO.error.getRotation().getDegrees());
