@@ -345,7 +345,6 @@ public class Elevator extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
-        final double t = Timer.getFPGATimestamp();
         mPeriodicIO.position_ticks = mMaster.getSelectedSensorPosition(0);
         mPeriodicIO.velocity_ticks_per_100ms = mMaster.getSelectedSensorVelocity(0);
         if (mMaster.getControlMode() == ControlMode.MotionMagic) {
@@ -373,7 +372,7 @@ public class Elevator extends Subsystem {
         }
         mPeriodicIO.output_percent = mMaster.getMotorOutputPercent();
         mPeriodicIO.limit_switch = mMaster.getSensorCollection().isRevLimitSwitchClosed();
-        mPeriodicIO.t = t;
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();;
 
         if (getInchesOffGround() > Constants.kElevatorEpsilon && !mShifter.get()) {
             mPeriodicIO.feedforward = /*mIntake.hasCube() ? Constants.kElevatorFeedforwardWithCube :*/ Constants
@@ -472,6 +471,7 @@ public class Elevator extends Subsystem {
 
     public static class PeriodicIO {
         // INPUTS
+        public double timestamp;
         public int position_ticks;
         public int velocity_ticks_per_100ms;
         public double active_trajectory_accel_g;
@@ -480,7 +480,6 @@ public class Elevator extends Subsystem {
         public double output_percent;
         public boolean limit_switch;
         public double feedforward;
-        public double t;
 
         // OUTPUTS
         public double demand;

@@ -324,6 +324,9 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
 
+        SmartDashboard.putNumber("Left Current", mPeriodicIO.left_current);
+        SmartDashboard.putNumber("Right Current", mPeriodicIO.right_current);
+
         SmartDashboard.putNumber("x err", mPeriodicIO.error.getTranslation().x());
         SmartDashboard.putNumber("y err", mPeriodicIO.error.getTranslation().y());
         SmartDashboard.putNumber("theta err", mPeriodicIO.error.getRotation().getDegrees());
@@ -459,6 +462,9 @@ public class Drive extends Subsystem {
             mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
         }
 
+        mPeriodicIO.left_current = mLeftMaster.getOutputCurrent();
+        mPeriodicIO.right_current = mRightMaster.getOutputCurrent();
+
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
@@ -543,6 +549,8 @@ public class Drive extends Subsystem {
         public int right_position_ticks;
         public double left_distance;
         public double right_distance;
+        public double left_current;
+        public double right_current;
         public int left_velocity_ticks_per_100ms;
         public int right_velocity_ticks_per_100ms;
         public Rotation2d gyro_heading = Rotation2d.identity();

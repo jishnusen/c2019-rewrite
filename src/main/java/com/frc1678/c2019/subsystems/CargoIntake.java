@@ -4,15 +4,15 @@ import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Victor;
 
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.drivers.MotorChecker;
+import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.util.TimeDelayedBoolean;
 
@@ -44,16 +44,20 @@ public class CargoIntake extends Subsystem {
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private CarriageCanifier mCanifier = CarriageCanifier.getInstance();
 
-    private final VictorSPX mMaster;
+    private final TalonSRX mMaster;
     private final Solenoid mPopoutSolenoid;
+
+    private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
 
     private CargoIntake() {
         mPopoutSolenoid = Constants.makeSolenoidForId(Constants.kCargoIntakePopoutSolenoidId);
 
-        mMaster = new VictorSPX(Constants.kCargoIntakeRollerId);
+        mMaster = TalonSRXFactory.createDefaultTalon(Constants.kCargoIntakeRollerId);
 
         mMaster.set(ControlMode.PercentOutput, 0);
         mMaster.setInverted(false);
+        mMaster.configForwardSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
+        mMaster.configReverseSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         mMaster.enableVoltageCompensation(true);
     }
@@ -69,6 +73,12 @@ public class CargoIntake extends Subsystem {
     public synchronized void outputTelemetry() {
         SmartDashboard.putBoolean("CargoProxy", mPeriodicIO.has_cargo);
         SmartDashboard.putNumber("MotorSetpoint", mPeriodicIO.demand);
+
+        SmartDashboard.putNumber("Cargo Current", mPeriodicIO.current);
+
+        if (mCSVWriter != null) {
+            mCSVWriter.write();
+        }
     }
 
     @Override
@@ -87,6 +97,7 @@ public class CargoIntake extends Subsystem {
             public void onStart(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
+                // startLogging();
             }
 
             @Override
@@ -105,6 +116,7 @@ public class CargoIntake extends Subsystem {
             public void onStop(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
+                stopLogging();
             }
         });
     }
@@ -117,12 +129,16 @@ public class CargoIntake extends Subsystem {
     public void runStateMachine(boolean modifyOutputs) {
         switch (mState) {
         case INTAKING:
+            if (hasCargo()) {
+                mPeriodicIO.demand = kHoldingVoltage;
+                mPeriodicIO.pop_out_solenoid = false;
+                mState = State.HOLDING;
+                break;
+            }
+            
             if (modifyOutputs) {
                 mPeriodicIO.demand = kIntakeVoltage;
                 mPeriodicIO.pop_out_solenoid = true;
-            }
-            if (hasCargo()) {
-                mState = State.HOLDING;
             }
             break;
         case OUTTAKING:
@@ -180,9 +196,15 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
+        mPeriodicIO.current = mMaster.getOutputCurrent();
         mDebouncedCargo = mLastSeenCargo.update(mCanifier.getCargoProxy(), 0.1);
         mPeriodicIO.has_cargo = mDebouncedCargo;
         mPeriodicIO.cargo_proxy = mCanifier.getCargoProxy();
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
+
+        if (mCSVWriter != null) {
+            mCSVWriter.add(mPeriodicIO);
+        }
     }
 
     @Override
@@ -196,11 +218,37 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        return true;
+        return TalonSRXChecker.checkMotors(this, new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+            private static final long serialVersionUID = 8343060678848936021L;
+            {
+                add(new MotorChecker.MotorConfig<>("cargo intake", mMaster));
+            }
+        }, new MotorChecker.CheckerConfig() {
+            {
+                mCurrentFloor = 2;
+                mCurrentEpsilon = 2.0;
+                mRPMSupplier = null;
+            }
+        });
+    }
+
+    public synchronized void startLogging() {
+        if (mCSVWriter == null) {
+            mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/CARGOINTAKE-LOGS.csv", PeriodicIO.class);
+        }
+    }
+
+    public synchronized void stopLogging() {
+        if (mCSVWriter != null) {
+            mCSVWriter.flush();
+            mCSVWriter = null;
+        }
     }
 
     public static class PeriodicIO {
         // INPUTS
+        public double timestamp;
+        public double current;
         public boolean has_cargo;
         public boolean cargo_proxy;
 
