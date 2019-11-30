@@ -55,7 +55,7 @@ public class CargoIntake extends Subsystem {
         mMaster = TalonSRXFactory.createDefaultTalon(Constants.kCargoIntakeRollerId);
 
         mMaster.set(ControlMode.PercentOutput, 0);
-        mMaster.setInverted(false);
+        mMaster.setInverted(true);
         mMaster.configForwardSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
         mMaster.configReverseSoftLimitEnable(false, Constants.kLongCANTimeoutMs);
         mMaster.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
@@ -97,7 +97,7 @@ public class CargoIntake extends Subsystem {
             public void onStart(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
-                // startLogging();
+                startLogging();
             }
 
             @Override
@@ -209,11 +209,15 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        mMaster.set(ControlMode.PercentOutput, 0.1);
+        return;
+/*
         mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
         if (Wrist.getInstance().getWantsPassThrough()) {
             forceIntakeIn();
         }
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
+        */
     }
 
     @Override
