@@ -432,6 +432,9 @@ public class Wrist extends Subsystem {
                 || sensorUnitsToDegrees(mPeriodicIO.active_trajectory_position) > Constants.kWristEpsilon) {
                 mPeriodicIO.feedforward = 1.53 * Math.cos(Math.toRadians(getAngle()));
         }
+
+        mPeriodicIO.current = mMaster.getOutputCurrent();
+
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
@@ -504,6 +507,7 @@ public class Wrist extends Subsystem {
         public double output_percent;
         public double output_voltage;
         public double feedforward;
+        public double current;
         public boolean limit_switch;
 
         // OUTPUTS
