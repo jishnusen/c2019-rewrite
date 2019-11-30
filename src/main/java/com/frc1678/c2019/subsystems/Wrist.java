@@ -17,6 +17,7 @@ import com.team254.lib.util.ReflectingCSVWriter;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.util.ArrayList;
 
@@ -423,6 +424,7 @@ public class Wrist extends Subsystem {
             mPeriodicIO.active_trajectory_velocity = 0;
             mPeriodicIO.active_trajectory_acceleration_rad_per_s2 = 0.0;
         }
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
         mPeriodicIO.limit_switch = mCanifier.getLimR();
         mPeriodicIO.output_voltage = mMaster.getMotorOutputVoltage();
         mPeriodicIO.output_percent = mMaster.getMotorOutputPercent();
@@ -500,6 +502,7 @@ public class Wrist extends Subsystem {
 
     public static class PeriodicIO {
         // INPUTS
+        public double timestamp;
         public int position_ticks;
         public int velocity_ticks_per_100ms;
         public int active_trajectory_position;

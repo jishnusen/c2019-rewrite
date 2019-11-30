@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Solenoid;
 
 import com.team254.lib.drivers.TalonSRXFactory;
@@ -195,6 +196,7 @@ public class CargoIntake extends Subsystem {
         mDebouncedCargo = mLastSeenCargo.update(mCanifier.getCargoProxy(), 0.1);
         mPeriodicIO.has_cargo = mDebouncedCargo;
         mPeriodicIO.cargo_proxy = mCanifier.getCargoProxy();
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
@@ -244,6 +246,7 @@ public class CargoIntake extends Subsystem {
         public double current;
         public boolean has_cargo;
         public boolean cargo_proxy;
+        public double timestamp;
 
         // OUTPUTS
         public double demand;
