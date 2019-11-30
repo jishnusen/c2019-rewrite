@@ -129,12 +129,16 @@ public class CargoIntake extends Subsystem {
     public void runStateMachine(boolean modifyOutputs) {
         switch (mState) {
         case INTAKING:
+            if (hasCargo()) {
+                mPeriodicIO.demand = kHoldingVoltage;
+                mPeriodicIO.pop_out_solenoid = false;
+                mState = State.HOLDING;
+                break;
+            }
+            
             if (modifyOutputs) {
                 mPeriodicIO.demand = kIntakeVoltage;
                 mPeriodicIO.pop_out_solenoid = true;
-            }
-            if (hasCargo()) {
-                mState = State.HOLDING;
             }
             break;
         case OUTTAKING:
