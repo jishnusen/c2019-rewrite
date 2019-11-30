@@ -243,10 +243,10 @@ public class CargoIntake extends Subsystem {
 
     public static class PeriodicIO {
         // INPUTS
+        public double timestamp;
         public double current;
         public boolean has_cargo;
         public boolean cargo_proxy;
-        public double timestamp;
 
         // OUTPUTS
         public double demand;
