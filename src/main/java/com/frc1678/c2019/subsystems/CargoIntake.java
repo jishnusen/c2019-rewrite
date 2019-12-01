@@ -209,15 +209,11 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
-        mMaster.set(ControlMode.PercentOutput, 0.1);
-        return;
-/*
         mMaster.set(ControlMode.PercentOutput, mPeriodicIO.demand / 12.0);
         if (Wrist.getInstance().getWantsPassThrough()) {
             forceIntakeIn();
         }
         mPopoutSolenoid.set(mPeriodicIO.pop_out_solenoid);
-        */
     }
 
     @Override
