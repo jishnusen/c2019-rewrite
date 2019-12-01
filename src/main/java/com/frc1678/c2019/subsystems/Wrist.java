@@ -330,7 +330,7 @@ public class Wrist extends Subsystem {
     /**
      * @return current position of the wrist in sensor units
      */
-    public synchronized double getPosition() { // returns angle of wrist in degrees
+    public synchronized double getPosition() { // returns angle of wrist in ticks
         return (mPeriodicIO.position_ticks);
     }
 
@@ -380,7 +380,7 @@ public class Wrist extends Subsystem {
     }
 
     private double sensorUnitsToDegrees(double units) {
-        return units * (360.0) / (4096.0 * 2.933);
+        return units * ((360.0) / (2048 * 72));
     }
 
     private double degreesToSensorUnits(double degrees) {
