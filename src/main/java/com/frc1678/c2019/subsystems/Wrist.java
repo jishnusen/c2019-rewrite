@@ -380,11 +380,11 @@ public class Wrist extends Subsystem {
     }
 
     private double sensorUnitsToDegrees(double units) {
-        return units * ((360.0) / (2048 * 72));
+        return units * (360.0) / (2048 * 72);
     }
 
     private double degreesToSensorUnits(double degrees) {
-        return degrees * (4096 * 2.933) / (360);
+        return degrees * (2048 * 72) / (360);
     }
 
     @Override
