@@ -101,12 +101,12 @@ public class Constants {
 
     // wrist
     // PID gains for wrist velocity loop
-    public static final double kWristKp = 1.0;
-    public static final double kWristKi = 0.0;
-    public static final double kWristKd = 20.0;
-    public static final double kWristKf = 0.3;
-    public static final double kWristJogKp = 2.0;
-    public static final double kWristJogKd = 40.0;
+    public static final double kWristKp = 1.0 / 40;
+    public static final double kWristKi = 0.0 / 40;
+    public static final double kWristKd = 20.0 / 40;
+    public static final double kWristKf = 0.3 / 40;
+    public static final double kWristJogKp = 2.0 / 40;
+    public static final double kWristJogKd = 40.0 / 40;
     public static final double kWristKaWithCube = 0.006;
     public static final double kWristKaWithoutCube = 0.003;
     public static final double kWristKfMultiplierEmpty = 0.1275;
@@ -115,8 +115,8 @@ public class Constants {
     public static final int kWristMaxIntegralAccumulator = 500000; //todo: tune me
     public static final int kWristIZone = 500; //todo: tune me
     public static final int kWristDeadband = 5; //todo: tune me
-    public static final int kWristCruiseVelocity = 2500; //todo: tune me
-    public static final int kWristAcceleration = 2500; //2000 //todo: tune me
+    public static final int kWristCruiseVelocity = 2500 * 40; //todo: tune me
+    public static final int kWristAcceleration = 2500* 40 ; //2000 //todo: tune me
     public static final double kWristRampRate = 0.001;
     public static final int kWristMasterId = 14;
     /* I/O */
