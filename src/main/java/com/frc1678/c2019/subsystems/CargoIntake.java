@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class CargoIntake extends Subsystem {
     // Intaking is positive
     public static double kIntakeVoltage = -12.0;
-    public static double kHoldingVoltage = -4.0;
+    public static double kHoldingVoltage = -1.0;
     public static double kOuttakeVoltage = 10.0;
 
     private static CargoIntake mInstance;
@@ -71,10 +71,11 @@ public class CargoIntake extends Subsystem {
 
     @Override
     public synchronized void outputTelemetry() {
-        SmartDashboard.putBoolean("CargoProxy", mPeriodicIO.has_cargo);
-        SmartDashboard.putNumber("MotorSetpoint", mPeriodicIO.demand);
-
-        SmartDashboard.putNumber("Cargo Current", mPeriodicIO.current);
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putBoolean("CargoProxy", mPeriodicIO.has_cargo);
+            SmartDashboard.putNumber("MotorSetpoint", mPeriodicIO.demand);
+            SmartDashboard.putNumber("Cargo Current", mPeriodicIO.current);
+        }
 
         if (mCSVWriter != null) {
             mCSVWriter.write();
@@ -97,7 +98,7 @@ public class CargoIntake extends Subsystem {
             public void onStart(double timestamp) {
                 mRunningManual = false;
                 mState = State.HOLDING;
-                startLogging();
+                // startLogging();
             }
 
             @Override
