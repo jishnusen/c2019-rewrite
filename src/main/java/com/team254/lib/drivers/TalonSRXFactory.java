@@ -18,7 +18,7 @@ public class TalonSRXFactory {
         public double NEUTRAL_DEADBAND = 0.04;
 
         public boolean ENABLE_CURRENT_LIMIT = false;
-        public boolean ENABLE_SOFT_LIMIT = true;
+        public boolean ENABLE_SOFT_LIMIT = false;
         public boolean ENABLE_LIMIT_SWITCH = false;
         public int FORWARD_SOFT_LIMIT = 0;
         public int REVERSE_SOFT_LIMIT = 0;
@@ -78,9 +78,9 @@ public class TalonSRXFactory {
 
         talon.clearStickyFaults(kTimeoutMs);
 
-        talon.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+        talon.configForwardLimitSwitchSource(LimitSwitchSource.Deactivated,
                 LimitSwitchNormal.Disabled, kTimeoutMs);
-        talon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+        talon.configReverseLimitSwitchSource(LimitSwitchSource.Deactivated,
                 LimitSwitchNormal.Disabled, kTimeoutMs);
         talon.overrideLimitSwitchesEnable(config.ENABLE_LIMIT_SWITCH);
 
