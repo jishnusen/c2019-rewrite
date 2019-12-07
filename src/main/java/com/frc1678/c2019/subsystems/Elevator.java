@@ -285,19 +285,23 @@ public class Elevator extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Elevator Output %", mPeriodicIO.output_percent);
-        SmartDashboard.putNumber("Elevator RPM", getRPM());
-        SmartDashboard.putNumber("Elevator Current", mMaster.getOutputCurrent());
-        // SmartDashboard.putNumber("Elevator Error", mMaster.getClosedLoopError(0) / kEncoderTicksPerInch);
         SmartDashboard.putNumber("Elevator Height", getInchesOffGround());
         SmartDashboard.putBoolean("Elevator Limit", mPeriodicIO.limit_switch);
-        SmartDashboard.putNumber("Elevator Sensor Height", mPeriodicIO.position_ticks);
 
-        SmartDashboard.putNumber("Elevator Last Expected Trajectory", mPeriodicIO.demand);
-        SmartDashboard.putNumber("Elevator Current Trajectory Point", mPeriodicIO.active_trajectory_position);
-        SmartDashboard.putNumber("Elevator Traj Vel", mPeriodicIO.active_trajectory_velocity);
-        SmartDashboard.putNumber("Elevator Traj Accel", mPeriodicIO.active_trajectory_accel_g);
-        SmartDashboard.putBoolean("Elevator Has Sent Trajectory", hasFinishedTrajectory());
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putNumber("Elevator Output %", mPeriodicIO.output_percent);
+            SmartDashboard.putNumber("Elevator RPM", getRPM());
+            SmartDashboard.putNumber("Elevator Current", mMaster.getOutputCurrent());
+            // SmartDashboard.putNumber("Elevator Error", mMaster.getClosedLoopError(0) / kEncoderTicksPerInch);
+            SmartDashboard.putBoolean("Elevator Limit", mPeriodicIO.limit_switch);
+            SmartDashboard.putNumber("Elevator Sensor Height", mPeriodicIO.position_ticks);
+
+            SmartDashboard.putNumber("Elevator Last Expected Trajectory", mPeriodicIO.demand);
+            SmartDashboard.putNumber("Elevator Current Trajectory Point", mPeriodicIO.active_trajectory_position);
+            SmartDashboard.putNumber("Elevator Traj Vel", mPeriodicIO.active_trajectory_velocity);
+            SmartDashboard.putNumber("Elevator Traj Accel", mPeriodicIO.active_trajectory_accel_g);
+            SmartDashboard.putBoolean("Elevator Has Sent Trajectory", hasFinishedTrajectory());
+        }
     }
 
     @Override
