@@ -443,6 +443,8 @@ public class Elevator extends Subsystem {
                            {
                                 add(new MotorChecker.MotorConfig<TalonSRX>("master", mMaster));
                                 add(new MotorChecker.MotorConfig<TalonSRX>("right_slave", mRightSlave));
+                                add(new MotorChecker.MotorConfig<TalonSRX>("left_slave_a", mLeftSlaveA));
+                                add(new MotorChecker.MotorConfig<TalonSRX>("left_slave_b", mLeftSlaveB));
                             }
                         }, new TalonSRXChecker.CheckerConfig() {
                             {
@@ -451,8 +453,8 @@ public class Elevator extends Subsystem {
                                 mCurrentEpsilon = 2.0;
                                 mRPMEpsilon = 250;
                                 mRunTimeSec = 2.0;
-                                mRunOutputPercentage = -0.4;
-                                mRPMSupplier = () -> -mMaster.getSelectedSensorVelocity(0);
+                                mRunOutputPercentage = 0.4;
+                                mRPMSupplier = () -> mMaster.getSelectedSensorVelocity(0);
                             }
                         });
 
