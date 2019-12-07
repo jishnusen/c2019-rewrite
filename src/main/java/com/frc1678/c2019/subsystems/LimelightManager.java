@@ -122,7 +122,7 @@ public class LimelightManager extends Subsystem {
    // }
 
     public synchronized void setActiveLimelight() {
-        mActiveLimelight = Elevator.getInstance().getPosition() < SuperstructureConstants.kSwitchLimelightHeight ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
+        mActiveLimelight = Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight ? ActiveLimelight.TOP : ActiveLimelight.BOTTOM;
         getInactiveLimelightObject().setLed(Limelight.LedMode.OFF);
         getActiveLimelightObject().setLed(Limelight.LedMode.PIPELINE);
     }

@@ -77,7 +77,7 @@ public class Superstructure extends Subsystem {
     }
 
     private synchronized void updateObservedState(SuperstructureState state) {
-        state.height = mElevator.getPosition();
+        state.height = mElevator.getInchesOffGround();
         state.angle = mWrist.getAngle();
         state.cargoIntakeOut = mCargoIntake.getIntakeOut();
         state.hatchIntakeOut = mHatchIntake.getIntakeOut();
@@ -92,16 +92,21 @@ public class Superstructure extends Subsystem {
             mElevator.setOpenLoop(commandState.openLoopElevatorPercent);
         } else {
             if(isElevatorJogging) {
-                mElevator.setSetpointPositionPID(commandState.height, Constants.kElevatorFeedforward);
+                mElevator.setPositionPID(commandState.height);
             } else {
-                mElevator.setSetpointMotionMagic(commandState.height);
+                mElevator.setMotionMagicPosition(commandState.height);
             }
         }
+        if (commandState.elevatorLowGear) {
+            mElevator.setHangMode(true);
+        } else {
+            mElevator.setHangMode(false);
+        }
         if(isWristJogging) {
-                mWrist.setPositionPIDAngle(commandState.wristAngle);
-            } else {
-                mWrist.setMotionProfileAngle(commandState.wristAngle);
-                }
+            mWrist.setPositionPIDAngle(commandState.wristAngle);
+        } else {
+            mWrist.setMotionProfileAngle(commandState.wristAngle);
+        }
     }
 
     @Override

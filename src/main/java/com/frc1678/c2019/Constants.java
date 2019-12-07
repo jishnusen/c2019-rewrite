@@ -43,59 +43,21 @@ public class Constants {
     // PID gains for elevator velocity loop (HIGH GEAR)
     // Units: setpoint, error, and output are in native units per 100ms.
     // Elevator encoder is CTRE mag encoder which is 4096 native units per revolution.
-
-      // elevator
-      public static final double kElevatorFeedforward = 1.3 / 12;
-
-      public static final ServoMotorSubsystemConstants kElevatorConstants = new ServoMotorSubsystemConstants();
-      static {
-          kElevatorConstants.kName = "Elevator";
-  
-          kElevatorConstants.kMasterConstants.id = 6;
-          kElevatorConstants.kMasterConstants.invert_motor = false;
-          kElevatorConstants.kMasterConstants.invert_sensor_phase = false;
-          kElevatorConstants.kSlaveConstants = new TalonSRXConstants[3];
-  
-          kElevatorConstants.kSlaveConstants[0] = new TalonSRXConstants();
-          kElevatorConstants.kSlaveConstants[1] = new TalonSRXConstants();
-          kElevatorConstants.kSlaveConstants[2] = new TalonSRXConstants();
-  
-          kElevatorConstants.kSlaveConstants[0].id = 7;
-          kElevatorConstants.kSlaveConstants[0].invert_motor = false;
-          kElevatorConstants.kSlaveConstants[1].id = 8;
-          kElevatorConstants.kSlaveConstants[1].invert_motor = false;
-          kElevatorConstants.kSlaveConstants[2].id = 9;
-          kElevatorConstants.kSlaveConstants[2].invert_motor = false;
-  
-          // Unit == Inches
-          kElevatorConstants.kHomePosition = 0.0;  // Inches off ground
-          kElevatorConstants.kTicksPerUnitDistance = (4096) / (Math.PI * 1.25 * 1.6);
-          kElevatorConstants.kKp = 0.12;
-          kElevatorConstants.kKi = 0;
-          kElevatorConstants.kKd = 4.0;
-          kElevatorConstants.kKf = .06; // lower speed:  0.08;
-          kElevatorConstants.kMaxIntegralAccumulator = 500000;
-          kElevatorConstants.kIZone = 0; // Ticks
-          kElevatorConstants.kDeadband = 0; // Ticks
-  
-          kElevatorConstants.kPositionKp = 0.1;
-          kElevatorConstants.kPositionKi = 0;
-          kElevatorConstants.kPositionKd = 3.0;
-          kElevatorConstants.kPositionKf = 0;
-         // kElevatorConstants.kPositionMaxIntegralAccumulator = 0;
-          kElevatorConstants.kPositionIZone = 0; // Ticks
-          kElevatorConstants.kPositionDeadband = 0; // Ticks
-  
-          kElevatorConstants.kMaxUnitsLimit = 71; // inches
-          kElevatorConstants.kMinUnitsLimit = 0.0; // inches
-  
-          kElevatorConstants.kCruiseVelocity = 14325; // Ticks / 100ms
-          kElevatorConstants.kAcceleration = 19100; // Ticks / 100ms / s
-          kElevatorConstants.kRampRate = 0.1; // s
-          kElevatorConstants.kContinuousCurrentLimit = 20; // amps
-          kElevatorConstants.kPeakCurrentLimit = 35; // amps
-          kElevatorConstants.kPeakCurrentDuration = 200; // milliseconds
-      }
+    public static final double kElevatorHighGearKp =  0.12;
+    public static final double kElevatorHighGearKi = 0.0;//0.0;
+    public static final double kElevatorHighGearKd = 4.0;
+    public static final double kElevatorHighGearKf = 0.06; // lower speed:  0.08;
+    public static final double kElevatorJogKp =  0.1;
+    public static final double kElevatorJogKd =  3.0;
+    public static final double kElevatorFeedforwardNoCube = 1.3 / 12;
+    public static final double kElevatorFeedforwardWithCube = 1.3 / 12;
+    public static final int kElevatorHighGearMaxIntegralAccumulator = 500000; //todo: tune me
+    public static final int kElevatorHighGearIZone = 0;
+    public static final int kElevatorHighGearDeadband = 0;
+    public static final int kElevatorHighGearCruiseVelocity = 14325;
+    public static final int kElevatorHighGearAcceleration = 19100;
+    public static final double kElevatorEpsilon = 1.0;
+    public static final double kElevatorRampRate = 0.1;
 
     // wrist
     public static final double kAutoWristRampRate = 0.01;

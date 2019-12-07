@@ -223,7 +223,7 @@ public class Drive extends Subsystem {
         double leftVoltage;
         double rightVoltage;
 
-        if (mLLManager.getActiveLimelight() == LimelightManager.ActiveLimelight.TOP || Elevator.getInstance().getPosition() < SuperstructureConstants.kSwitchLimelightHeight) {
+        if (mLLManager.getActiveLimelight() == LimelightManager.ActiveLimelight.TOP || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
             leftVoltage = (throttle + steering) / 12.0;
             rightVoltage = (throttle - steering) / 12.0;
           } else {

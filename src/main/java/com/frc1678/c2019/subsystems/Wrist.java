@@ -289,12 +289,10 @@ public class Wrist extends Subsystem {
         mDesiredState = SystemState.OPEN_LOOP;
     }
 
-    public synchronized boolean resetIfAtLimit() {
+    public synchronized void resetIfAtLimit() {
         if (mCanifier.getLimR()) {
             zeroSensors();
-            return true;
         }
-        return false;
     }
 
     /**
