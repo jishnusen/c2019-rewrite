@@ -13,7 +13,8 @@ import java.util.Enumeration;
  * determined through calibrations.
  */
 public class Constants {
-    public static final double kLooperDt = 0.01;
+    public static final double kLooperDt = 0.02;
+    public static final boolean kDebuggingOutput = false;
     /* ROBOT PHYSICAL CONSTANTS */
     // Wheels
     public static final double kDriveWheelTrackWidthInches = 27.75;
@@ -22,20 +23,20 @@ public class Constants {
     public static final double kTrackScrubFactor = 1.0;  // Tune me!
     // Tuned dynamics
     public static final double kRobotLinearInertia = 60.0;  // kg TODO tune
-    public static final double kRobotAngularInertia = 10.0;  // kg m^2 TODO tune
-    public static final double kRobotAngularDrag = 12.0;  // N*m / (rad/sec) TODO tune
-    public static final double kDriveVIntercept = 1.48;  // V
-    public static final double kDriveKv = 0.137;  // V per rad/s
-    public static final double kDriveKa = 0.032;  // V per rad/s^2
+    public static final double kRobotAngularInertia = 12.0;  // kg m^2 TODO tune
+    public static final double kRobotAngularDrag = 0.0;  // N*m / (rad/sec) TODO tune
+    public static final double kDriveVIntercept = 0.44;  // V
+    public static final double kDriveKv = 0.129;  // V per rad/s
+    public static final double kDriveKa = 0.012;  // V per rad/s^2
     public static final double kPathKX = 4.0;  // units/s per unit of error
     public static final double kPathLookaheadTime = 0.4;  // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0;  // inches
     public static final double kPathFollowingMaxAccel = 80.0;  // inches per second ^ 2
     // PID gains for drive velocity loop 
     // Units: setpoint, error, and output are in ticks per second.
-    public static final double kDriveVelocityKp = 0.9;
+    public static final double kDriveVelocityKp = 0.1;
     public static final double kDriveVelocityKi = 0.0;
-    public static final double kDriveVelocityKd = 10.0;
+    public static final double kDriveVelocityKd = 1.0;
     public static final double kDriveVelocityKf = 0.0;
     public static final int kDriveVelocityIZone = 0;
     public static final double kDriveVoltageRampRate = 0.0;
@@ -101,12 +102,12 @@ public class Constants {
 
     // wrist
     // PID gains for wrist velocity loop
-    public static final double kWristKp = 1.0;
+    public static final double kWristKp = 0.1;
     public static final double kWristKi = 0.0;
-    public static final double kWristKd = 20.0;
-    public static final double kWristKf = 0.3;
-    public static final double kWristJogKp = 2.0;
-    public static final double kWristJogKd = 40.0;
+    public static final double kWristKd = 0.0;
+    public static final double kWristKf = 0.0465;
+    public static final double kWristJogKp = 2.0 / 40;
+    public static final double kWristJogKd = 40.0 / 40;
     public static final double kWristKaWithCube = 0.006;
     public static final double kWristKaWithoutCube = 0.003;
     public static final double kWristKfMultiplierEmpty = 0.1275;
@@ -115,8 +116,8 @@ public class Constants {
     public static final int kWristMaxIntegralAccumulator = 500000; //todo: tune me
     public static final int kWristIZone = 500; //todo: tune me
     public static final int kWristDeadband = 5; //todo: tune me
-    public static final int kWristCruiseVelocity = 2500; //todo: tune me
-    public static final int kWristAcceleration = 2500; //2000 //todo: tune me
+    public static final int kWristCruiseVelocity = 20500; //todo: tune me
+    public static final int kWristAcceleration = 25000; //2000 //todo: tune me
     public static final double kWristRampRate = 0.001;
     public static final int kWristMasterId = 14;
     /* I/O */

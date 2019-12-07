@@ -34,9 +34,11 @@ public class HatchIntake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putBoolean("LeftHatchProxy", getLeftHatchProxy());
-        SmartDashboard.putBoolean("RightHatchProxy", getRightHatchProxy());
-        SmartDashboard.putBoolean("Has Hatch", hasHatch());
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putBoolean("Has Hatch", hasHatch());
+            SmartDashboard.putBoolean("LeftHatchProxy", getLeftHatchProxy());
+            SmartDashboard.putBoolean("RightHatchProxy", getRightHatchProxy());
+        }
     }
 
     @Override

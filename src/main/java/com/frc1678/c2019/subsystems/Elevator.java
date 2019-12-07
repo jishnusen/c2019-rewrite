@@ -29,12 +29,6 @@ public class Elevator extends ServoMotorSubsystem {
 
     private Elevator(final ServoMotorSubsystemConstants constants) {
         super(constants);
-        TalonSRXUtil.checkError(
-                mMaster.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
-                        LimitSwitchNormal.NormallyOpen, Constants.kLongCANTimeoutMs),
-                "Unable to set reverse limit switch for elevator.");
-
-        mMaster.overrideLimitSwitchesEnable(true);
     }
 
     @Override

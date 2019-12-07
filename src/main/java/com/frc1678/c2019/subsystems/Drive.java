@@ -32,10 +32,10 @@ import java.util.ArrayList;
 public class Drive extends Subsystem {
 
     private static final int kVelocityControlSlot = 0;
-    private static final double DRIVE_ENCODER_PPR = 4096.;
+    private static final double DRIVE_ENCODER_PPR = 2048. * 7.2;
     private static Drive mInstance = new Drive();
     // Hardware
-    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
+    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveB, mRightSlaveB;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
@@ -50,7 +50,7 @@ public class Drive extends Subsystem {
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
     private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
-    private final PIDController throttlePID2 = new PIDController(.15, 0.00, 0.0);
+    private final PIDController throttlePID2 = new PIDController(.08, 0.00, 0.0);
     private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);    
 
     private final Loop mLoop = new Loop() {
@@ -59,7 +59,7 @@ public class Drive extends Subsystem {
             synchronized (Drive.this) {
                 setOpenLoop(new DriveSignal(0.05, 0.05));
                 setBrakeMode(false);
-//                 startLogging();
+                //startLogging();
             }
         }
 
@@ -110,9 +110,9 @@ public class Drive extends Subsystem {
         mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
         configureMaster(mLeftMaster, true);
 
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
+/*         mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
                 Constants.kLeftDriveMasterId);
-        mLeftSlaveA.setInverted(true);
+        mLeftSlaveA.setInverted(true); */
 
         mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
                 Constants.kLeftDriveMasterId);
@@ -121,9 +121,9 @@ public class Drive extends Subsystem {
         mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
         configureMaster(mRightMaster, false);
 
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
+/*         mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
                 Constants.kRightDriveMasterId);
-        mRightSlaveA.setInverted(false);
+        mRightSlaveA.setInverted(false); */
 
         mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
                 Constants.kRightDriveMasterId);
@@ -163,7 +163,7 @@ public class Drive extends Subsystem {
     }
 
     private static double radiansPerSecondToTicksPer100ms(double rad_s) {
-        return rad_s /(Math.PI * 2.0) * 4096.0 / 10.0;
+        return rad_s /(Math.PI * 2.0) * (2048.0 * 7.2) / 10.0;
     }
 
     @Override
@@ -197,7 +197,7 @@ public class Drive extends Subsystem {
        
         if (firstRun) {
           throttlePID.setGoal(24.0);
-          throttlePID2.setGoal(14.0);
+          throttlePID2.setGoal(18.0);
           steeringPID.setGoal(0.0);
 
           throttlePID.reset();
@@ -216,9 +216,9 @@ public class Drive extends Subsystem {
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
 
-        double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
-        double throttle2 = throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
-        double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
+        double throttle = -throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
+        double throttle2 = -throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
+        double steering = -steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
 
         double leftVoltage;
         double rightVoltage;
@@ -286,11 +286,11 @@ public class Drive extends Subsystem {
             mIsBrakeMode = on;
             NeutralMode mode = on ? NeutralMode.Brake : NeutralMode.Coast;
             mRightMaster.setNeutralMode(mode);
-            mRightSlaveA.setNeutralMode(mode);
+            //mRightSlaveA.setNeutralMode(mode);
             mRightSlaveB.setNeutralMode(mode);
 
             mLeftMaster.setNeutralMode(mode);
-            mLeftSlaveA.setNeutralMode(mode);
+            //mLeftSlaveA.setNeutralMode(mode);
             mLeftSlaveB.setNeutralMode(mode);
         }
     }
@@ -315,18 +315,26 @@ public class Drive extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        
         SmartDashboard.putNumber("Right Drive Distance", mPeriodicIO.right_distance);
-        SmartDashboard.putNumber("Right Drive Ticks", mPeriodicIO.right_position_ticks);
-        SmartDashboard.putNumber("Left Drive Ticks", mPeriodicIO.left_position_ticks);
         SmartDashboard.putNumber("Left Drive Distance", mPeriodicIO.left_distance);
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
 
-        SmartDashboard.putNumber("x err", mPeriodicIO.error.getTranslation().x());
-        SmartDashboard.putNumber("y err", mPeriodicIO.error.getTranslation().y());
-        SmartDashboard.putNumber("theta err", mPeriodicIO.error.getRotation().getDegrees());
         if(getHeading() != null) {
             SmartDashboard.putNumber("Gyro Heading", getHeading().getDegrees());
+        }
+
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putNumber("Right Drive Ticks", mPeriodicIO.right_position_ticks);
+            SmartDashboard.putNumber("Left Drive Ticks", mPeriodicIO.left_position_ticks);
+
+            SmartDashboard.putNumber("Left Current", mPeriodicIO.left_current);
+            SmartDashboard.putNumber("Right Current", mPeriodicIO.right_current);
+
+            SmartDashboard.putNumber("x err", mPeriodicIO.error.getTranslation().x());
+            SmartDashboard.putNumber("y err", mPeriodicIO.error.getTranslation().y());
+            SmartDashboard.putNumber("theta err", mPeriodicIO.error.getRotation().getDegrees());
         }
         if (mCSVWriter != null) {
             mCSVWriter.write();
@@ -443,24 +451,28 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(-mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
-        double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / 4096.0) * Math.PI;
+        double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / (2048.0 * 7.2)) * Math.PI;
         if (deltaLeftTicks > 0.0) {
             mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
         } else {
             mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
         }
 
-        double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / 4096.0) * Math.PI;
+        double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / (2048.0 * 7.2)) * Math.PI;
         if (deltaRightTicks > 0.0) {
             mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
         } else {
             mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
         }
 
+        mPeriodicIO.left_current = mLeftMaster.getOutputCurrent();
+        mPeriodicIO.right_current = mRightMaster.getOutputCurrent();
+
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
 
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
         // System.out.println("control state: " + mDriveControlState + ", left: " + mPeriodicIO.left_demand + ", right: " + mPeriodicIO.right_demand);
     }
 
@@ -484,7 +496,7 @@ public class Drive extends Subsystem {
                     private static final long serialVersionUID = 4715363468641125563L;
                     {
                         add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
-                        add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
+                        //add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
                         add(new MotorChecker.MotorConfig<>("left_slave1", mLeftSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
@@ -501,7 +513,7 @@ public class Drive extends Subsystem {
                     private static final long serialVersionUID = 8979637825679409635L;
                     {
                         add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
-                        add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
+                        //add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
                         add(new MotorChecker.MotorConfig<>("right_slave1", mRightSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
@@ -536,11 +548,15 @@ public class Drive extends Subsystem {
     }
 
     public static class PeriodicIO {
+        public double timestamp;
+
         // INPUTS
         public int left_position_ticks;
         public int right_position_ticks;
         public double left_distance;
         public double right_distance;
+        public double left_current;
+        public double right_current;
         public int left_velocity_ticks_per_100ms;
         public int right_velocity_ticks_per_100ms;
         public Rotation2d gyro_heading = Rotation2d.identity();

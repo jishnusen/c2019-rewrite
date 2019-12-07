@@ -5,6 +5,7 @@ import com.team254.lib.physics.DriveCharacterization;
 import com.team254.lib.util.DriveSignal;
 import com.team254.lib.util.ReflectingCSVWriter;
 import edu.wpi.first.wpilibj.Timer;
+import com.frc1678.c2019.Constants;
 
 import java.util.List;
 
@@ -43,20 +44,26 @@ public class CollectVelocityData implements Action {
 
     @Override
     public void update() {
-        double dt = Timer.getFPGATimestamp() - mStartTime;
-        double percentPower = kRampRate * dt;
-        if(percentPower > kMaxPower) {
-            isFinished = true;
-            return;
+        synchronized (mDrive) {
+            double dt = Timer.getFPGATimestamp() - mStartTime;
+            double percentPower = kRampRate * dt;
+            if (percentPower > kMaxPower) {
+                isFinished = true;
+                return;
+            }
+            mDrive.setOpenLoop(new DriveSignal((mReverse ? -1.0 : 1.0) * percentPower, (mReverse ? -1.0 : 1.0) * (mTurn ? -1.0 : 1.0) * percentPower));
+            double velocity = mDrive.getLeftLinearVelocity() / Constants.kDriveWheelRadiusInches;  // rad/s
+            if (velocity < 0.5) {
+                // Small velocities tend to be untrustworthy.
+                return;
+            }
+            mVelocityData.add(new DriveCharacterization.DataPoint(
+                    velocity, // rad/s
+                    percentPower * 12.0, // convert to volts
+                    dt
+            ));
         }
-        mDrive.setOpenLoop(new DriveSignal((mReverse ? -1.0 : 1.0) * percentPower, (mReverse ? -1.0 : 1.0) * (mTurn ? -1.0 : 1.0) * percentPower));
-        mVelocityData.add(new DriveCharacterization.DataPoint(
-                (Math.abs(mDrive.getLeftVelocityNativeUnits()) + Math.abs(mDrive.getRightVelocityNativeUnits())) / 4096.0 * Math.PI * 10, //convert velocity to radians per second
-                percentPower * 12.0, //convert to volts
-                dt
-        ));
         mCSVWriter.add(mVelocityData.get(mVelocityData.size() - 1));
-
     }
 
     @Override

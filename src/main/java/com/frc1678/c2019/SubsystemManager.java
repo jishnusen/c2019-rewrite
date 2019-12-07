@@ -6,87 +6,88 @@ import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.subsystems.Subsystem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Used to reset, start, stop, and update all subsystems at once
  */
 public class SubsystemManager implements ILooper {
+    public static SubsystemManager mInstance = null;
 
-    private final List<Subsystem> mAllSubsystems;
+    private List<Subsystem> mAllSubsystems;
     private List<Loop> mLoops = new ArrayList<>();
 
-    public SubsystemManager(List<Subsystem> allSubsystems) {
-        mAllSubsystems = allSubsystems;
+    private SubsystemManager() {}
+
+    public static SubsystemManager getInstance() {
+        if (mInstance == null) {
+            mInstance = new SubsystemManager();
+        }
+
+        return mInstance;
     }
 
     public void outputToSmartDashboard() {
-        mAllSubsystems.forEach((s) -> s.outputTelemetry());
+        mAllSubsystems.forEach(Subsystem::outputTelemetry);
     }
 
-    public void writeToLog() {
-        mAllSubsystems.forEach((s) -> s.writeToLog());
+    public boolean checkSubsystems() {
+        boolean ret_val = true;
+
+        for (Subsystem s : mAllSubsystems) {
+            ret_val &= s.checkSystem();
+        }
+
+        return ret_val;
     }
 
     public void stop() {
-        mAllSubsystems.forEach((s) -> s.stop());
+        mAllSubsystems.forEach(Subsystem::stop);
+    }
+
+    public List<Subsystem> getSubsystems() {
+        return mAllSubsystems;
+    }
+
+    public void setSubsystems(Subsystem... allSubsystems) {
+        mAllSubsystems = Arrays.asList(allSubsystems);
     }
 
     private class EnabledLoop implements Loop {
-
         @Override
         public void onStart(double timestamp) {
-            for (Loop l : mLoops) {
-                l.onStart(timestamp);
-            }
+            mLoops.forEach(l -> l.onStart(timestamp));
         }
 
         @Override
         public void onLoop(double timestamp) {
-            for (Subsystem s : mAllSubsystems) {
-                s.readPeriodicInputs();
-            }
-            for (Loop l : mLoops) {
-                l.onLoop(timestamp);
-            }
-            for (Subsystem s : mAllSubsystems) {
-                s.writePeriodicOutputs();
-            }
+            mAllSubsystems.forEach(Subsystem::readPeriodicInputs);
+            mLoops.forEach(l -> l.onLoop(timestamp));
+            mAllSubsystems.forEach(Subsystem::writePeriodicOutputs);
         }
 
         @Override
         public void onStop(double timestamp) {
-            for (Loop l : mLoops) {
-                l.onStop(timestamp);
-            }
+            mLoops.forEach(l -> l.onStop(timestamp));
         }
     }
 
     private class DisabledLoop implements Loop {
-
         @Override
-        public void onStart(double timestamp) {
-
-        }
+        public void onStart(double timestamp) {}
 
         @Override
         public void onLoop(double timestamp) {
-            for (Subsystem s : mAllSubsystems) {
-                s.readPeriodicInputs();
-            }
-            for (Subsystem s : mAllSubsystems) {
-                s.writePeriodicOutputs();
-            }
+            mAllSubsystems.forEach(Subsystem::readPeriodicInputs);
         }
 
         @Override
-        public void onStop(double timestamp) {
-
-        }
+        public void onStop(double timestamp) {}
     }
 
     public void registerEnabledLoops(Looper enabledLooper) {
-        mAllSubsystems.forEach((s) -> s.registerEnabledLoops(this));
+        mAllSubsystems.forEach(s -> s.registerEnabledLoops(this));
         enabledLooper.register(new EnabledLoop());
     }
 

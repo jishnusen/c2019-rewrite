@@ -17,6 +17,7 @@ import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.subsystems.RobotStateEstimator;
 import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -37,14 +38,9 @@ public class Robot extends TimedRobot {
     private boolean had_cargo_ = false;
     private boolean climb_mode = false;
 
-    private final SubsystemManager mSubsystemManager = new SubsystemManager(
-            Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), LimelightManager.getInstance(), Superstructure.getInstance(),
-                    HatchIntake.getInstance(), CargoIntake.getInstance(), Wrist.getInstance(), Elevator.getInstance(),
-                    Climber.getInstance(), CarriageCanifier.getInstance(), Infrastructure.getInstance()
-            ));
+    private final SubsystemManager mSubsystemManager = SubsystemManager.getInstance();
 
     private Drive mDrive = Drive.getInstance();
-    private LimelightManager mLLManager = LimelightManager.getInstance();
     private HatchIntake mHatchIntake = HatchIntake.getInstance();
     private CargoIntake mCargoIntake = CargoIntake.getInstance();
     private Wrist mWrist = Wrist.getInstance();
@@ -52,6 +48,12 @@ public class Robot extends TimedRobot {
     private Superstructure mSuperstructure = Superstructure.getInstance();
     private Elevator mElevator = Elevator.getInstance();
     private Climber mClimber = Climber.getInstance();
+    private CarriageCanifier mCarriageCanifier = CarriageCanifier.getInstance();
+
+    private LimelightManager mLLManager = LimelightManager.getInstance();
+    
+    private RobotState mRobotState = RobotState.getInstance();
+    private RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
 
     private AutoModeExecutor mAutoModeExecutor;
 
@@ -74,9 +76,24 @@ public class Robot extends TimedRobot {
              */
 
             CrashTracker.logRobotInit();
+            mSubsystemManager.setSubsystems(
+                mRobotStateEstimator,
+                mDrive,
+                mLLManager, 
+                mSuperstructure, 
+//                mHatchIntake,
+//                mCargoIntake, 
+                mWrist, 
+                //mElevator, 
+//                mClimber, 
+                mCarriageCanifier,
+                mInfrastructure
+            );
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+
+            mRobotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
 
             mTrajectoryGenerator.generateTrajectories();
         } catch (Throwable t) {
@@ -106,6 +123,7 @@ public class Robot extends TimedRobot {
             mAutoModeExecutor = new AutoModeExecutor();
 
             mDisabledLooper.start();
+            mLLManager.setAllLeds(Limelight.LedMode.OFF);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -186,16 +204,28 @@ public class Robot extends TimedRobot {
     }
 
     @Override
+    public void robotPeriodic() {
+        try {
+            //mSubsystemManager.outputToSmartDashboard();
+            mRobotState.outputToSmartDashboard();
+            mAutoModeSelector.outputToSmartDashboard();
+            mEnabledLooper.outputToSmartDashboard();
+            //mDisabledLooper.outputToSmartDashboard();
+        } catch (Throwable t) {
+            CrashTracker.logThrowableCrash(t);
+            throw t;
+        }
+    }
+
+    @Override
     public void disabledPeriodic() {
         SmartDashboard.putString("Match Cycle", "DISABLED");
 
         // mLimelight.setStream(2);
 
         try {
-            outputToSmartDashboard();
             mElevator.resetIfAtLimit();
             mWrist.resetIfAtLimit();
-            mLLManager.setAllLeds(Limelight.LedMode.OFF);
 
             mAutoModeSelector.updateModeCreator();
             mWantsDriverAuto = mAutoModeSelector.isDriveByCamera();
@@ -204,7 +234,6 @@ public class Robot extends TimedRobot {
             if (autoMode.isPresent() && autoMode.get() != mAutoModeExecutor.getAutoMode()) {
                 System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
                 mAutoModeExecutor.setAutoMode(autoMode.get());
-                System.gc();
             }
 
         } catch (Throwable t) {
@@ -217,7 +246,6 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         SmartDashboard.putString("Match Cycle", "AUTONOMOUS");
 
-        outputToSmartDashboard();
         try {
             if (mWantsDriverAuto || mAutoModeExecutor.isInterrupted()) {
                 manualControl();
@@ -243,8 +271,6 @@ public class Robot extends TimedRobot {
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
         }
        
-        outputToSmartDashboard();
-
         final boolean cargo_preset = mCargoIntake.hasCargo();
         double desired_height = Double.NaN;
         double desired_angle = Double.NaN;
@@ -373,7 +399,6 @@ public class Robot extends TimedRobot {
 
         try {
             manualControl();
-            outputToSmartDashboard();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -383,19 +408,5 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         SmartDashboard.putString("Match Cycle", "TEST");
-    }
-
-    public void outputToSmartDashboard() {
-        RobotState.getInstance().outputToSmartDashboard();
-        //Drive.getInstance().outputTelemetry();
-        Wrist.getInstance().outputTelemetry();
-        //CargoIntake.getInstance().outputTelemetry();
-        //HatchIntake.getInstance().outputTelemetry();
-        Elevator.getInstance().outputTelemetry();
-        //Infrastructure.getInstance().outputTelemetry();
-        //LimelightManager.getInstance().outputTelemetry();
-        mEnabledLooper.outputToSmartDashboard();
-        mAutoModeSelector.outputToSmartDashboard();
-        // SmartDashboard.updateValues();
     }
 }

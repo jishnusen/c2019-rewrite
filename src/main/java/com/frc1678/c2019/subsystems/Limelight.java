@@ -99,11 +99,12 @@ public class Limelight extends Subsystem {
 
     @Override
     public synchronized void outputTelemetry() {
-        SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mPeriodicIO.hasTarget);
-        SmartDashboard.putNumber(mConstants.kName + ": XOffset", mPeriodicIO.xOffset);
-        SmartDashboard.putNumber(mConstants.kName + ": yOffset", mPeriodicIO.yOffset);
-        SmartDashboard.putNumber(mConstants.kName + ": Distance", mTargetDist);
-
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putBoolean(mConstants.kName + ": Has Target", mPeriodicIO.hasTarget);
+            SmartDashboard.putNumber(mConstants.kName + ": XOffset", mPeriodicIO.xOffset);
+            SmartDashboard.putNumber(mConstants.kName + ": yOffset", mPeriodicIO.yOffset);
+            SmartDashboard.putNumber(mConstants.kName + ": Distance", mTargetDist);
+        }
     }
     public double getXOffset() {
         return mPeriodicIO.xOffset;
