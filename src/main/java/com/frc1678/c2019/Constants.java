@@ -40,6 +40,9 @@ public class Constants {
     public static final double kDriveVelocityKf = 0.0;
     public static final int kDriveVelocityIZone = 0;
     public static final double kDriveVoltageRampRate = 0.0;
+
+    public static final double kHighGearVoltageScale = 1.0;
+    public static final double kLowGearVoltageScale = 0.66;
     // PID gains for elevator velocity loop (HIGH GEAR)
     // Units: setpoint, error, and output are in native units per 100ms.
     // Elevator encoder is CTRE mag encoder which is 4096 native units per revolution.

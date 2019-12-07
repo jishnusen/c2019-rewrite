@@ -270,6 +270,12 @@ public class Robot extends TimedRobot {
         } else {
             mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
         }
+
+        if (mControlBoard.getHighGear()) {
+            mDrive.setHighGear(true);
+        } else if (mControlBoard.getLowGear()) {
+            mDrive.setHighGear(false);
+        }
        
         final boolean cargo_preset = mCargoIntake.hasCargo();
         double desired_height = Double.NaN;
