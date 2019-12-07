@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class Wrist extends Subsystem {
     private static final int kMagicMotionSlot = 0;
     private static final int kPositionControlSlot = 1;
-    private static final int kForwardSoftLimit = (int) ((190.0) * ((4096 * 2.933) / (180.0))) ; // Encoder ticks.
+    private static final int kForwardSoftLimit = (int) ((190.0) * ((2048 * 72) / (360.0))) ; // Encoder ticks.
     private static final int kReverseSoftLimit = -500; // Encoder ticks. TODO make ~0 once skipping is fixed.
 
     private static final double kHomingOutput = -0.25;
@@ -167,7 +167,7 @@ public class Wrist extends Subsystem {
 
         mMaster.setInverted(false);
         mMaster.setSensorPhase(false);
-        mMaster.setNeutralMode(NeutralMode.Brake);
+        mMaster.setNeutralMode(NeutralMode.Coast);
         mMaster.overrideLimitSwitchesEnable(true);
         mMaster.overrideSoftLimitsEnable(true);
 
@@ -192,25 +192,25 @@ public class Wrist extends Subsystem {
     @Override
     public synchronized void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Angle", getAngle());
-        SmartDashboard.putNumber("Wrist Position", getPosition());
-        SmartDashboard.putNumber("Wrist Ticks", mPeriodicIO.position_ticks);
-        SmartDashboard.putNumber("Wrist periodic demand", mPeriodicIO.demand);
-        SmartDashboard.putBoolean("LIMR", mPeriodicIO.limit_switch);
-        SmartDashboard.putNumber("Wrist Current", mPeriodicIO.current);
-
         SmartDashboard.putBoolean("Zero wrist", mHasBeenZeroed);
 
+        if (Constants.kDebuggingOutput) {
+            SmartDashboard.putBoolean("Wrist LIMR", mPeriodicIO.limit_switch);
+            SmartDashboard.putNumber("Wrist Position", getPosition());
+            SmartDashboard.putNumber("Wrist Ticks", mPeriodicIO.position_ticks);
+            SmartDashboard.putNumber("Wrist periodic demand", mPeriodicIO.demand);
+            SmartDashboard.putNumber("Wrist Current", mPeriodicIO.current);
 
-        SmartDashboard.putNumber("Wrist RPM", getRPM());
-        SmartDashboard.putNumber("Wrist Power %", mPeriodicIO.output_percent);
-        SmartDashboard.putBoolean("Wrist Limit Switch", mPeriodicIO.limit_switch);
-        SmartDashboard.putNumber("Wrist Last Expected Trajectory", getSetpoint());
-        SmartDashboard.putNumber("Wrist Current Trajectory Point", mPeriodicIO.active_trajectory_position);
-        SmartDashboard.putNumber("Wrist Traj Vel", mPeriodicIO.active_trajectory_velocity);
-        SmartDashboard.putNumber("Wrist Traj Accel", mPeriodicIO.active_trajectory_acceleration_rad_per_s2);
-        SmartDashboard.putBoolean("Wrist Has Sent Trajectory", hasFinishedTrajectory());
-        SmartDashboard.putNumber("Wrist feedforward", mPeriodicIO.feedforward);
-
+            SmartDashboard.putNumber("Wrist RPM", getRPM());
+            SmartDashboard.putNumber("Wrist Power %", mPeriodicIO.output_percent);
+            SmartDashboard.putBoolean("Wrist Limit Switch", mPeriodicIO.limit_switch);
+            SmartDashboard.putNumber("Wrist Last Expected Trajectory", getSetpoint());
+            SmartDashboard.putNumber("Wrist Current Trajectory Point", mPeriodicIO.active_trajectory_position);
+            SmartDashboard.putNumber("Wrist Traj Vel", mPeriodicIO.active_trajectory_velocity);
+            SmartDashboard.putNumber("Wrist Traj Accel", mPeriodicIO.active_trajectory_acceleration_rad_per_s2);
+            SmartDashboard.putBoolean("Wrist Has Sent Trajectory", hasFinishedTrajectory());
+            SmartDashboard.putNumber("Wrist feedforward", mPeriodicIO.feedforward);
+        }
         if (mCSVWriter != null) {
             mCSVWriter.write();
         }
@@ -246,6 +246,7 @@ public class Wrist extends Subsystem {
             @Override
             public void onStart(double timestamp) {
                 mHomingStartTime = timestamp;
+                mMaster.setNeutralMode(NeutralMode.Brake);
                 // startLogging();
             }
 
@@ -278,6 +279,7 @@ public class Wrist extends Subsystem {
             @Override
             public void onStop(double timestamp) {
                 stopLogging();
+                mMaster.setNeutralMode(NeutralMode.Coast);
             }
         });
     }
@@ -288,7 +290,7 @@ public class Wrist extends Subsystem {
     }
 
     public synchronized boolean resetIfAtLimit() {
-        if (mCanifier.getLimR() && !mHasBeenZeroed) {
+        if (mCanifier.getLimR()) {
             zeroSensors();
             return true;
         }
@@ -380,7 +382,7 @@ public class Wrist extends Subsystem {
     }
 
     private double sensorUnitsToDegrees(double units) {
-        return units * (360.0) / (2048 * 72);
+        return (units * 360.0) / (2048 * 72);
     }
 
     private double degreesToSensorUnits(double degrees) {
@@ -433,7 +435,14 @@ public class Wrist extends Subsystem {
 
         if (getAngle() > Constants.kWristEpsilon
                 || sensorUnitsToDegrees(mPeriodicIO.active_trajectory_position) > Constants.kWristEpsilon) {
-                mPeriodicIO.feedforward = 1.53 * Math.cos(Math.toRadians(getAngle()));
+                double ff = 0.05;
+                /*if (CargoIntake.getInstance().hasCargo()) {
+                    ff += 0.05;
+                }
+                if (HatchIntake.getInstance().hasHatch()) {
+                    ff += 0.05;
+                }*/
+                mPeriodicIO.feedforward = ff * Math.cos(Math.toRadians(getAngle()));
         }
 
         mPeriodicIO.current = mMaster.getOutputCurrent();
@@ -451,9 +460,7 @@ public class Wrist extends Subsystem {
         }
 
         if (mDesiredState == SystemState.MOTION_PROFILING) {
-
-                mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
-                    0.0 / 12.0);
+                mMaster.set(ControlMode.MotionMagic, mPeriodicIO.demand);//, DemandType.ArbitraryFeedForward, mPeriodicIO.feedforward);
         } else if (mDesiredState == SystemState.POSITION_PID) {
             mMaster.set(ControlMode.Position, mPeriodicIO.demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.feedforward / 12.0);
