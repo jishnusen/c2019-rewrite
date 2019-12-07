@@ -26,8 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.Arrays;
 import java.util.Optional;
 
-
-
 public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
@@ -51,7 +49,7 @@ public class Robot extends TimedRobot {
     private CarriageCanifier mCarriageCanifier = CarriageCanifier.getInstance();
 
     private LimelightManager mLLManager = LimelightManager.getInstance();
-    
+
     private RobotState mRobotState = RobotState.getInstance();
     private RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
 
@@ -77,18 +75,17 @@ public class Robot extends TimedRobot {
 
             CrashTracker.logRobotInit();
             mSubsystemManager.setSubsystems(
-                mRobotStateEstimator,
-                mDrive,
+                mRobotStateEstimator, 
+                mDrive, 
                 mLLManager, 
-                mSuperstructure, 
-//                mHatchIntake,
-//                mCargoIntake, 
-                mWrist, 
-                //mElevator, 
-//                mClimber, 
-                mCarriageCanifier,
-                mInfrastructure
-            );
+                mSuperstructure,
+                // mHatchIntake,
+                mCargoIntake,
+                mWrist,
+                // mElevator,
+                // mClimber,
+                mCarriageCanifier, 
+                mInfrastructure);
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
@@ -206,11 +203,11 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         try {
-            //mSubsystemManager.outputToSmartDashboard();
+            // mSubsystemManager.outputToSmartDashboard();
             mRobotState.outputToSmartDashboard();
             mAutoModeSelector.outputToSmartDashboard();
             mEnabledLooper.outputToSmartDashboard();
-            //mDisabledLooper.outputToSmartDashboard();
+            // mDisabledLooper.outputToSmartDashboard();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -276,7 +273,7 @@ public class Robot extends TimedRobot {
         } else if (mControlBoard.getLowGear()) {
             mDrive.setHighGear(false);
         }
-       
+
         final boolean cargo_preset = mCargoIntake.hasCargo();
         double desired_height = Double.NaN;
         double desired_angle = Double.NaN;
