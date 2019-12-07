@@ -17,8 +17,8 @@ import java.util.List;
 
 public class TrajectoryGenerator {
     private static final double kMaxVelocity = 130.0;
-    private static final double kMaxAccel = 130.0;
-    private static final double kMaxCentripetalAccel = 110.0;
+    private static final double kMaxAccel = 110.0;
+    private static final double kMaxCentripetalAccel = 80.0;
     private static final double kMaxVoltage = 9.0;
 
 
