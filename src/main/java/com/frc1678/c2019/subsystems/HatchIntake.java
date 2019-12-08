@@ -65,10 +65,8 @@ public class HatchIntake extends Subsystem {
 
             @Override
             public void onLoop(double timestamp) {
-                synchronized (HatchIntake.this) {
                     HatchIntakeState newState = mStateMachine.update(Timer.getFPGATimestamp(), mWantedAction, getCurrentState());
                     updateActuatorFromState(newState);
-                }
             }
 
             @Override
@@ -88,11 +86,11 @@ public class HatchIntake extends Subsystem {
         mBackplateSolenoid.set(Wrist.getInstance().getWantsPassThrough() ? false : (mWantedAction == WantedAction.NONE && CargoIntake.getInstance().getIntakeOut() ? false : state.backplateSolenoid));
     }
 
-    public synchronized boolean hasHatch() {
+    public boolean hasHatch() {
         return mStateMachine.debouncedHatch();
     }
 
-    public synchronized boolean getIntakeOut() {
+    public boolean getIntakeOut() {
         return mBackplateSolenoid.get();
     }
 

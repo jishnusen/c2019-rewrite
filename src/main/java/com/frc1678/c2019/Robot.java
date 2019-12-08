@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
                 mDrive, 
                 mLLManager, 
                 mSuperstructure,
-                // mHatchIntake,
+                mHatchIntake,
                 mCargoIntake,
                 mWrist,
                 mElevator,
