@@ -79,10 +79,10 @@ public class Robot extends TimedRobot {
                 mDrive, 
                 mLLManager, 
                 mSuperstructure,
-                // mHatchIntake,
+                mHatchIntake,
                 mCargoIntake,
                 mWrist,
-                // mElevator,
+                mElevator,
                 // mClimber,
                 mCarriageCanifier, 
                 mInfrastructure);
@@ -331,7 +331,7 @@ public class Robot extends TimedRobot {
             }
 
             if (mCargoIntake.hasCargo() && !had_cargo_ && !mControlBoard.getRunOuttake()) {
-                if (mElevator.getPosition() < 5 && mWrist.getAngle() < 5) {
+                if (mElevator.getInchesOffGround() < 5 && mWrist.getAngle() < 5) {
                     desired_height = SuperstructureConstants.kStowHeight;
                     desired_angle = SuperstructureConstants.kStowAngle;
                 }
@@ -348,7 +348,7 @@ public class Robot extends TimedRobot {
                 mClimber.setState(Climber.WantedAction.DROP);
             }
 
-            if (mElevator.getPosition() >= SuperstructureConstants.kCrawlerHeight - 10 && mControlBoard.Crawl()) {
+            if (mElevator.getInchesOffGround() >= SuperstructureConstants.kCrawlerHeight - 10 && mControlBoard.Crawl()) {
                 System.out.println("Attempting CRAWL");
                 desired_height = 0.0;
                 desired_angle = SuperstructureConstants.kBustDownAngle;
