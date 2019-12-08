@@ -51,8 +51,7 @@ public class Wrist extends Subsystem {
         if (errorCode != ErrorCode.OK)
             DriverStation.reportError("Could not set wrist encoder!!!: " + errorCode, false);
 
-        errorCode = mMaster.configSelectedFeedbackSensor(RemoteFeedbackDevice.RemoteSensor0, 0,
-                Constants.kLongCANTimeoutMs);
+        errorCode = mMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         if (errorCode != ErrorCode.OK)
             DriverStation.reportError("Could not detect wrist encoder: " + errorCode, false);
 

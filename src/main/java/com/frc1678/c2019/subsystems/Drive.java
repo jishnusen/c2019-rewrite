@@ -42,7 +42,8 @@ public class Drive extends Subsystem {
     // Hardware states
     private PeriodicIO mPeriodicIO;
     private boolean mIsBrakeMode;
-    public final boolean isHighGear = false;
+    private boolean mIsHighGear = false;
+    private double mPsuedoShiftScale = Constants.kHighGearVoltageScale;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
@@ -184,8 +185,8 @@ public class Drive extends Subsystem {
             mLeftMaster.configNeutralDeadband(0.04, 0);
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
-        mPeriodicIO.left_demand = signal.getLeft();
-        mPeriodicIO.right_demand = signal.getRight();
+        mPeriodicIO.left_demand = signal.getLeft() * mPsuedoShiftScale;
+        mPeriodicIO.right_demand = signal.getRight() * mPsuedoShiftScale;
         mPeriodicIO.left_feedforward = 0.0;
         mPeriodicIO.right_feedforward = 0.0;
     }
@@ -259,6 +260,15 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_demand = signal.getRight();
         mPeriodicIO.left_feedforward = feedforward.getLeft();
         mPeriodicIO.right_feedforward = feedforward.getRight();
+    }
+
+    public boolean isHighGear() {
+        return mIsHighGear;
+    }
+
+    public void setHighGear(boolean wantsHighGear) {
+        mIsHighGear = wantsHighGear;
+        mPsuedoShiftScale = wantsHighGear ? Constants.kHighGearVoltageScale : Constants.kLowGearVoltageScale;
     }
 
     public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory) {
