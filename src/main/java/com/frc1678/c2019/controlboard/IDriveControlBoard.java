@@ -11,6 +11,9 @@ public interface IDriveControlBoard {
 
     boolean getStartVisionPressed();
 
+    boolean getHighGear();
+
+    boolean getLowGear();
 
     boolean getInterruptAuto();
 }
