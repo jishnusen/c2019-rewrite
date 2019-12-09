@@ -265,7 +265,8 @@ public class Robot extends TimedRobot {
         if (vision && mLLManager.getHasTarget() && mLLManager.getLimelightOK()) {
             mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
         } else {
-            mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
+            //mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
+            mDrive.setCheesyishDrive(throttle, turn, mControlBoard.getQuickTurn());
         }
 
         if (mControlBoard.getHighGear()) {
