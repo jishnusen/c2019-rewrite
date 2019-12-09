@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.frc1678.c2019.Constants;
+import com.frc1678.c2019.Kinematics;
 import com.frc1678.c2019.RobotState;
 import com.frc1678.c2019.loops.ILooper;
 import com.frc1678.c2019.loops.Loop;
@@ -18,6 +19,7 @@ import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.trajectory.TrajectoryIterator;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.util.DriveSignal;
@@ -35,7 +37,7 @@ public class Drive extends Subsystem {
     private static final double DRIVE_ENCODER_PPR = 2048. * 7.2;
     private static Drive mInstance = new Drive();
     // Hardware
-    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveB, mRightSlaveB;
+    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
@@ -111,9 +113,9 @@ public class Drive extends Subsystem {
         mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
         configureMaster(mLeftMaster, true);
 
-/*         mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
+        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
                 Constants.kLeftDriveMasterId);
-        mLeftSlaveA.setInverted(true); */
+        mLeftSlaveA.setInverted(true);
 
         mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
                 Constants.kLeftDriveMasterId);
@@ -122,9 +124,9 @@ public class Drive extends Subsystem {
         mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
         configureMaster(mRightMaster, false);
 
-/*         mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
+        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
                 Constants.kRightDriveMasterId);
-        mRightSlaveA.setInverted(false); */
+        mRightSlaveA.setInverted(false);
 
         mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
                 Constants.kRightDriveMasterId);
@@ -189,7 +191,33 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_demand = signal.getRight() * mPsuedoShiftScale;
         mPeriodicIO.left_feedforward = 0.0;
         mPeriodicIO.right_feedforward = 0.0;
+    }    
+    
+    public synchronized void setCheesyishDrive(double throttle, double wheel, boolean quickTurn) {
+        if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
+            throttle = 0.0;
+        }
+
+        if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+            wheel = 0.0;
+        }
+
+        final double kWheelGain = 0.05;
+        final double kWheelNonlinearity = 0.05;
+        final double denominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
+        // Apply a sin function that's scaled to make it feel better.
+        if (!quickTurn) {
+            wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
+            wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
+            wheel = wheel / (denominator * denominator) * Math.abs(throttle);
+        }
+
+        wheel *= kWheelGain;
+        DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel));
+        double scaling_factor = Math.max(1.0, Math.max(Math.abs(signal.getLeft()), Math.abs(signal.getRight())));
+        setOpenLoop(new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
+
 
     /**
      * Configure talons for open loop control
@@ -296,11 +324,11 @@ public class Drive extends Subsystem {
             mIsBrakeMode = on;
             NeutralMode mode = on ? NeutralMode.Brake : NeutralMode.Coast;
             mRightMaster.setNeutralMode(mode);
-            //mRightSlaveA.setNeutralMode(mode);
+            mRightSlaveA.setNeutralMode(mode);
             mRightSlaveB.setNeutralMode(mode);
 
             mLeftMaster.setNeutralMode(mode);
-            //mLeftSlaveA.setNeutralMode(mode);
+            mLeftSlaveA.setNeutralMode(mode);
             mLeftSlaveB.setNeutralMode(mode);
         }
     }
@@ -506,7 +534,7 @@ public class Drive extends Subsystem {
                     private static final long serialVersionUID = 4715363468641125563L;
                     {
                         add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
-                        //add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
+                        add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
                         add(new MotorChecker.MotorConfig<>("left_slave1", mLeftSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
@@ -523,7 +551,7 @@ public class Drive extends Subsystem {
                     private static final long serialVersionUID = 8979637825679409635L;
                     {
                         add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
-                        //add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
+                        add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
                         add(new MotorChecker.MotorConfig<>("right_slave1", mRightSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
