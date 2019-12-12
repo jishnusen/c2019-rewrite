@@ -2,6 +2,6 @@
  has data to be logged
  implements ILogger.java*/
 public interface ILoggable{
-    float[] get_items();
-    String[] get_item_names();
+    ArrayList<float> get_items();
+    ArrayList<String> get_item_names();
 }
