@@ -13,6 +13,7 @@ import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.planners.DriveMotionPlanner;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.lib.control.PIDController;
+import com.frc1678.lib.control.StabilizingController;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
@@ -54,7 +55,8 @@ public class Drive extends Subsystem {
     private final LimelightManager mLLManager = LimelightManager.getInstance();
     private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
     private final PIDController throttlePID2 = new PIDController(.08, 0.00, 0.0);
-    private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);    
+    private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);
+    private final StabilizingController steeringStabilizer = new StabilizingController(.1, 0.0, 0.005);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -63,6 +65,7 @@ public class Drive extends Subsystem {
                 setOpenLoop(new DriveSignal(0.05, 0.05));
                 setBrakeMode(false);
                 //startLogging();
+                steeringStabilizer.setSetpoint(-mPigeon.getFusedHeading());
             }
         }
 
@@ -74,6 +77,8 @@ public class Drive extends Subsystem {
                         break;
                     case PATH_FOLLOWING:
                         updatePathFollower();
+                        break;
+                    case CLOSED_LOOP:
                         break;
                     default:
                         System.out.println("Unexpected drive control state: " + mDriveControlState);
@@ -169,6 +174,10 @@ public class Drive extends Subsystem {
         return rad_s /(Math.PI * 2.0) * (2048.0 * 7.2) / 10.0;
     }
 
+    private static double inchesPerSecondToTicksPer100ms(double in_s) {
+        return radiansPerSecondToTicksPer100ms(in_s / Constants.kDriveWheelRadiusInches);
+    }
+
     @Override
     public void registerEnabledLoops(ILooper in) {
         in.register(mLoop);
@@ -203,7 +212,7 @@ public class Drive extends Subsystem {
         }
 
         final double kWheelGain = 0.05;
-        final double kWheelNonlinearity = 0.05;
+        final double kWheelNonlinearity = 0.1;
         final double denominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
         // Apply a sin function that's scaled to make it feel better.
         if (!quickTurn) {
@@ -218,6 +227,38 @@ public class Drive extends Subsystem {
         setOpenLoop(new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
 
+    public synchronized void setClosedLoopDrive(double throttle, double wheel, boolean quickTurn) {
+        if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
+            throttle = 0.0;
+        }
+
+        if (Util.epsilonEquals(wheel, 0.0, 0.035)) {
+            wheel = 0.0;
+        }
+
+        final double kWheelGain = 0.05;
+        final double kWheelNonlinearity = 0.05;
+        final double denominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
+        // Apply a sin function that's scaled to make it feel better.
+        if (!quickTurn) {
+            wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
+            wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
+            wheel = wheel / (denominator * denominator) * throttle;
+        }
+
+        wheel *= kWheelGain;
+        wheel *= 1000.0;
+        steeringStabilizer.setRate(0);
+        final double t = Timer.getFPGATimestamp();
+        double steeringVelocityOffset = steeringStabilizer.update(t,
+                RobotState.getInstance().getFieldToVehicle(t).getRotation().getDegrees()) * 110;
+        double throttleVelocity = throttle * 110 * mPsuedoShiftScale;
+        System.out.println(steeringVelocityOffset);
+        DriveSignal velocity_signal = new DriveSignal(throttleVelocity + steeringVelocityOffset, throttleVelocity - steeringVelocityOffset);
+        final double kV_conversion = Constants.kDriveKv / (Constants.kDriveWheelRadiusInches * 12.0);
+        DriveSignal feedforward_signal = new DriveSignal(velocity_signal.getLeft() * kV_conversion, velocity_signal.getRight() * kV_conversion);
+        setClosedLoop(velocity_signal); 
+    }
 
     /**
      * Configure talons for open loop control
@@ -270,6 +311,23 @@ public class Drive extends Subsystem {
         setOpenLoop(signal);
     }
 
+    public synchronized void setClosedLoop(DriveSignal signal) {
+        if (mDriveControlState != DriveControlState.CLOSED_LOOP) {
+            // We entered a velocity control state.
+            setBrakeMode(true);
+            mLeftMaster.selectProfileSlot(kVelocityControlSlot, 0);
+            mRightMaster.selectProfileSlot(kVelocityControlSlot, 0);
+            mLeftMaster.configNeutralDeadband(0.0, 0);
+            mRightMaster.configNeutralDeadband(0.0, 0);
+
+            mDriveControlState = DriveControlState.CLOSED_LOOP;
+        }
+        mPeriodicIO.left_demand = radiansPerSecondToTicksPer100ms(signal.getLeft());
+        mPeriodicIO.right_demand = radiansPerSecondToTicksPer100ms(signal.getRight());
+        mPeriodicIO.left_feedforward = (signal.getLeft() * Constants.kDriveKv) / 12.0;
+        mPeriodicIO.right_feedforward = (signal.getRight() * Constants.kDriveKv) / 12.0;
+    }
+
     /**
      * Configures talons for velocity control
      */
@@ -284,7 +342,7 @@ public class Drive extends Subsystem {
 
             mDriveControlState = DriveControlState.PATH_FOLLOWING;
         }
-        mPeriodicIO.left_demand = signal.getLeft();
+        mPeriodicIO.left_demand =  signal.getLeft();
         mPeriodicIO.right_demand = signal.getRight();
         mPeriodicIO.left_feedforward = feedforward.getLeft();
         mPeriodicIO.right_feedforward = feedforward.getRight();
@@ -481,6 +539,8 @@ public class Drive extends Subsystem {
 
     @Override
     public synchronized void readPeriodicInputs() {
+        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
+
         double prevLeftTicks = mPeriodicIO.left_position_ticks;
         double prevRightTicks = mPeriodicIO.right_position_ticks;
         mPeriodicIO.left_position_ticks = mLeftMaster.getSelectedSensorPosition(0);
@@ -509,8 +569,6 @@ public class Drive extends Subsystem {
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
         }
-
-        mPeriodicIO.timestamp = Timer.getFPGATimestamp();
         // System.out.println("control state: " + mDriveControlState + ", left: " + mPeriodicIO.left_demand + ", right: " + mPeriodicIO.right_demand);
     }
 
@@ -519,11 +577,16 @@ public class Drive extends Subsystem {
         if (mDriveControlState == DriveControlState.OPEN_LOOP) {
             mLeftMaster.set(ControlMode.PercentOutput, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward, 0.0);
             mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward, 0.0);
-        } else {
+        } else if (mDriveControlState == DriveControlState.PATH_FOLLOWING) {
             mLeftMaster.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.left_feedforward + Constants.kDriveVelocityKd * mPeriodicIO.left_accel / 1023.0);
             mRightMaster.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
                     mPeriodicIO.right_feedforward + Constants.kDriveVelocityKd * mPeriodicIO.right_accel / 1023.0);
+        } else if (mDriveControlState == DriveControlState.CLOSED_LOOP) {
+            mLeftMaster.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.left_feedforward);
+            mRightMaster.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
+                    mPeriodicIO.right_feedforward);
         }
     }
 
@@ -583,6 +646,7 @@ public class Drive extends Subsystem {
     public enum DriveControlState {
         OPEN_LOOP, // open loop voltage control
         PATH_FOLLOWING, // velocity PID control
+        CLOSED_LOOP, // teleop velocity control
     }
 
     public static class PeriodicIO {
