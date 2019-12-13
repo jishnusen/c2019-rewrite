@@ -21,8 +21,16 @@ public class LoggerMain {
            //  write to files
            // fileWriter.write(items);
            //  fileWrter.write(item_names);
-           fileWriter.write(items.get(0).toString());
-           fileWriter.write(item_names.get(0));
+           for (int h=0; h < item_names.size(); h++) {
+           fileWriter.write(item_names.get(h));
+           fileWriter.write(",");
+           }
+           fileWriter.write("\n");
+           for (int j=0; j < items.size(); j++) {
+            fileWriter.write(items.get(j).toString());
+            fileWriter.write(",");
+           } 
+           fileWriter.write("\n");
         }
         fileWriter.close(); // makes sure its actually written
     } catch (Exception e) {}  // making compiler happy by trying to catch stuff that could crash 
