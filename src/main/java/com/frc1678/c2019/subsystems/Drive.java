@@ -51,12 +51,13 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
     private boolean mOverrideTrajectory = false;
+    private double mWheelNonzeroTimestamp = 0.0;
 
     private final LimelightManager mLLManager = LimelightManager.getInstance();
     private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
     private final PIDController throttlePID2 = new PIDController(.08, 0.00, 0.0);
     private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);
-    private final StabilizingController steeringStabilizer = new StabilizingController(.1, 0.0, 0.005);    
+    private final PIDController steeringStabilizer = new PIDController(.1, 0.0, 0.005);    
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -65,7 +66,6 @@ public class Drive extends Subsystem {
                 setOpenLoop(new DriveSignal(0.05, 0.05));
                 setBrakeMode(false);
                 //startLogging();
-                steeringStabilizer.setSetpoint(-mPigeon.getFusedHeading());
             }
         }
 
@@ -227,7 +227,8 @@ public class Drive extends Subsystem {
         setOpenLoop(new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
 
-    public synchronized void setClosedLoopDrive(double throttle, double wheel, boolean quickTurn) {
+    public synchronized void setAssistedDrive(final double timestamp, double throttle, double wheel, boolean quickTurn) {
+        
         if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
             throttle = 0.0;
         }
@@ -238,6 +239,8 @@ public class Drive extends Subsystem {
 
         final double kWheelGain = 0.05;
         final double kWheelNonlinearity = 0.05;
+        final double kMaxCurvature = 1.0 / 27.0;
+        final double kMaxLinearVel = 110.0;
         final double denominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
         // Apply a sin function that's scaled to make it feel better.
         if (!quickTurn) {
@@ -247,17 +250,19 @@ public class Drive extends Subsystem {
         }
 
         wheel *= kWheelGain;
-        wheel *= 1000.0;
-        steeringStabilizer.setRate(0);
-        final double t = Timer.getFPGATimestamp();
-        double steeringVelocityOffset = steeringStabilizer.update(t,
-                RobotState.getInstance().getFieldToVehicle(t).getRotation().getDegrees()) * 110;
-        double throttleVelocity = throttle * 110 * mPsuedoShiftScale;
-        System.out.println(steeringVelocityOffset);
-        DriveSignal velocity_signal = new DriveSignal(throttleVelocity + steeringVelocityOffset, throttleVelocity - steeringVelocityOffset);
-        final double kV_conversion = Constants.kDriveKv / (Constants.kDriveWheelRadiusInches * 12.0);
-        DriveSignal feedforward_signal = new DriveSignal(velocity_signal.getLeft() * kV_conversion, velocity_signal.getRight() * kV_conversion);
-        setClosedLoop(velocity_signal); 
+        throttle *= 110;
+        if (!quickTurn) {
+            Util.limit(wheel, throttle * kMaxCurvature);
+        }
+        final double heading = RobotState.getInstance().getFieldToVehicle(timestamp).getRotation().getRadians();
+        double correction = steeringStabilizer.update(timestamp, heading);
+        if (wheel != 0.0 || (timestamp - mWheelNonzeroTimestamp) < 0.5) {
+            correction = 0;
+            mWheelNonzeroTimestamp = timestamp;
+            steeringStabilizer.setGoal(heading);
+        }
+        DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel + correction));
+        setClosedLoop(new DriveSignal(Util.limit(signal.getLeft(), kMaxLinearVel) / 2.0, Util.limit(signal.getRight(), kMaxLinearVel) / 2.0));
     }
 
     /**
