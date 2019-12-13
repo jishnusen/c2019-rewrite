@@ -14,6 +14,7 @@ import java.util.List;
 public class Logger {
     // 1.1
     void LoggingClass() {
+
     }
     // 1.2
     public List[] canCall;
