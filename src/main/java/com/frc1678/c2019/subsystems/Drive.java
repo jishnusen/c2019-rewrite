@@ -57,7 +57,10 @@ public class Drive extends Subsystem {
     private final PIDController throttlePID = new PIDController(.15, 0.00, 0.0);
     private final PIDController throttlePID2 = new PIDController(.08, 0.00, 0.0);
     private final PIDController steeringPID = new PIDController(.2, 0.00, 0.01);
-    private final PIDController steeringStabilizer = new PIDController(.1, 0.0, 0.005);    
+    private final PIDController steeringStabilizer = new PIDController(3.0, 0.0, 0.1, 0.05);
+    
+    private boolean mHasResetSteering = false;
+    private boolean mStartedResetTimer = false;
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -65,7 +68,8 @@ public class Drive extends Subsystem {
             synchronized (Drive.this) {
                 setOpenLoop(new DriveSignal(0.05, 0.05));
                 setBrakeMode(false);
-                //startLogging();
+                mStartedResetTimer = false;
+                mHasResetSteering = false;
             }
         }
 
@@ -227,7 +231,7 @@ public class Drive extends Subsystem {
         setOpenLoop(new DriveSignal(signal.getLeft() / scaling_factor, signal.getRight() / scaling_factor));
     }
 
-    public synchronized void setAssistedDrive(final double timestamp, double throttle, double wheel, boolean quickTurn) {
+    public synchronized void setAssistedDrive(double timestamp, double throttle, double wheel, boolean quickTurn) {
         
         if (Util.epsilonEquals(throttle, 0.0, 0.04)) {
             throttle = 0.0;
@@ -237,31 +241,47 @@ public class Drive extends Subsystem {
             wheel = 0.0;
         }
 
-        final double kWheelGain = 0.05;
-        final double kWheelNonlinearity = 0.05;
+        final double kWheelGain = 7.0;
+        final double kWheelNonlinearity = 0.01;
         final double kMaxCurvature = 1.0 / 27.0;
-        final double kMaxLinearVel = 110.0;
+        final double kMaxLinearVel = 144.0;
         final double denominator = Math.sin(Math.PI / 2.0 * kWheelNonlinearity);
         // Apply a sin function that's scaled to make it feel better.
         if (!quickTurn) {
             wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
             wheel = Math.sin(Math.PI / 2.0 * kWheelNonlinearity * wheel);
-            wheel = wheel / (denominator * denominator) * throttle;
+            wheel = wheel / (denominator * denominator) * Math.abs(throttle);
         }
 
         wheel *= kWheelGain;
-        throttle *= 110;
+        throttle *= kMaxLinearVel;
         if (!quickTurn) {
             Util.limit(wheel, throttle * kMaxCurvature);
         }
         final double heading = RobotState.getInstance().getFieldToVehicle(timestamp).getRotation().getRadians();
         double correction = steeringStabilizer.update(timestamp, heading);
-        if (wheel != 0.0 || (timestamp - mWheelNonzeroTimestamp) < 0.5) {
-            correction = 0;
+        if (!mStartedResetTimer && Math.abs(wheel) < Util.kEpsilon) {
             mWheelNonzeroTimestamp = timestamp;
-            steeringStabilizer.setGoal(heading);
+            mStartedResetTimer = true;
         }
+
+        if (Math.abs(wheel) > Util.kEpsilon) {
+            mStartedResetTimer = false;
+        }
+
+        if ((timestamp - mWheelNonzeroTimestamp) < 0.5 || Math.abs(wheel) > Util.kEpsilon) {
+            correction = 0;
+            mHasResetSteering = false;
+        } else if (!mHasResetSteering) {
+            correction = 0;
+            steeringStabilizer.setGoal(heading);
+            mHasResetSteering = true;
+        }
+
+        //System.out.println(correction);
+
         DriveSignal signal = Kinematics.inverseKinematics(new Twist2d(throttle, 0.0, wheel + correction));
+        //setOpenLoop(new DriveSignal(0.0, 0.0));
         setClosedLoop(new DriveSignal(Util.limit(signal.getLeft(), kMaxLinearVel) / 2.0, Util.limit(signal.getRight(), kMaxLinearVel) / 2.0));
     }
 
@@ -319,7 +339,7 @@ public class Drive extends Subsystem {
     public synchronized void setClosedLoop(DriveSignal signal) {
         if (mDriveControlState != DriveControlState.CLOSED_LOOP) {
             // We entered a velocity control state.
-            setBrakeMode(true);
+            setBrakeMode(false);
             mLeftMaster.selectProfileSlot(kVelocityControlSlot, 0);
             mRightMaster.selectProfileSlot(kVelocityControlSlot, 0);
             mLeftMaster.configNeutralDeadband(0.0, 0);

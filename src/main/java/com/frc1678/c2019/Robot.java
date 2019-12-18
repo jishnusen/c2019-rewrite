@@ -267,7 +267,7 @@ public class Robot extends TimedRobot {
             mDrive.updateVisionPID(mControlBoard.getStartVisionPressed());
         } else {
             //mDrive.setOpenLoop(mCheesyDriveHelper.cheesyDrive(throttle, turn, mControlBoard.getQuickTurn(), false));
-            mDrive.setCheesyishDrive(throttle, -turn, mControlBoard.getQuickTurn());
+            mDrive.setAssistedDrive(timestamp, throttle, -turn, mControlBoard.getQuickTurn());
         }
 
         if (mControlBoard.getHighGear()) {
