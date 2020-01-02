@@ -10,6 +10,7 @@
         1.4) Create LS thread and update regularly
 */
 package com.team254.lib.util;
+
 import com.team254.lib.util.*;
 import java.util.ArrayList;
 import java.io.FileWriter;
@@ -25,7 +26,6 @@ public class LoggingSystem {
             fileWriter = new FileWriter("Test.csv");
         } catch (Exception e) {}
     }
-
     void Register() {  //  start function that opens files
         try {
              // creating a loggable object 
