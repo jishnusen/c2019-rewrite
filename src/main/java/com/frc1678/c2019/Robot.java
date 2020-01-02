@@ -30,12 +30,15 @@ import java.util.Optional;
 public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
+    private Looper mLoggingLooper = new Looper();
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
     private IControlBoard mControlBoard = ControlBoard.getInstance();
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
     private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private boolean had_cargo_ = false;
     private boolean climb_mode = false;
+
+    private LoggingSystem mLogger = LoggingSystem.getInstance();
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
             Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), LimelightManager.getInstance(), Superstructure.getInstance(),
@@ -77,6 +80,9 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+            //  initialization for logger
+            // mLogger.register [include all subsystems]
+            mLogger.registerLoops(mLoggingLooper);
 
             mTrajectoryGenerator.generateTrajectories();
         } catch (Throwable t) {

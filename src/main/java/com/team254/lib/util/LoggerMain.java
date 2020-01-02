@@ -2,7 +2,7 @@ package com.team254.lib.util;
 
 public class LoggerMain {
     public static void main(String[] args) {
-      LoggingSystem LS = new LoggingSystem();
+      LoggingSystem LS = LoggingSystem.getInstance();
        // creating a loggable object 
        ILoggable loggable = new TestLoggable();
        LS.Register(loggable, "Test.csv");

@@ -10,18 +10,28 @@
         1.4) Create LS thread and update regularly
 */
 package com.team254.lib.util;
+import com.frc1678.c2019.loops.Looper;
+import com.frc1678.c2019.loops.Loop;
+import com.frc1678.c2019.loops.ILooper;
 
 import java.util.ArrayList;
 import java.io.FileWriter;
 
 public class LoggingSystem {
+    private static LoggingSystem mInstance; 
     // 1.1
     //  LoggableItems object
     ArrayList<ILoggable> loggable_items = new ArrayList<ILoggable>();
 
     //  creating a usingFileWriter object per loggable file
     ArrayList<FileWriter> loggable_files = new ArrayList<FileWriter>();
-    void LoggingSystem() {
+    private LoggingSystem() {
+    }
+    public synchronized static LoggingSystem getInstance() {
+        if (mInstance == null) {
+            mInstance = new LoggingSystem();
+        }
+        return mInstance; 
     }
     void Register(ILoggable new_loggable, String filename) {  //  start function that opens files
         FileWriter fileWriter = null;
@@ -68,7 +78,18 @@ public class LoggingSystem {
             }
         } catch (Exception e) {}
     }
-    // 1.2
-    public ArrayList<String> canCall;
-    
+    public void registerLoops(ILooper looper) {
+        looper.register(new Loop() {
+            @Override
+            public void onStart(double timestamp) {
+            }
+            @Override 
+            public void onLoop(double timestamp) {
+                Log();
+            }
+            @Override 
+            public void onStop(double timestamp) {
+            }
+        });
+    }
 }
