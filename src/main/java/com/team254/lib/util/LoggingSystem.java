@@ -11,7 +11,6 @@
 */
 package com.team254.lib.util;
 
-import com.team254.lib.util.*;
 import java.util.ArrayList;
 import java.io.FileWriter;
 
@@ -26,12 +25,10 @@ public class LoggingSystem {
             fileWriter = new FileWriter("Test.csv");
         } catch (Exception e) {}
     }
-    void Register() {  //  start function that opens files
+    void Register(ILoggable new_loggable) {  //  start function that opens files
         try {
-             // creating a loggable object 
-            ILoggable loggable = new TestLoggable();
             //  adding Loggable to Loggable_items list
-            loggable_items.add(loggable);
+            loggable_items.add(new_loggable);
         } catch (Exception e) {}
 
     }
