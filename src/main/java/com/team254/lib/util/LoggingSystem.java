@@ -11,6 +11,7 @@
 */
 package com.team254.lib.util;
 import java.util.ArrayList;
+import java.io.FileWriter;
 
 public class LoggingSystem {
     // 1.1
