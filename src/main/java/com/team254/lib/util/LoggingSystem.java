@@ -44,16 +44,19 @@ public class LoggingSystem {
     void Log() {  //  function that gets called and told when to log by main
         try{
             for (int i=0; i < loggable_items.size(); i++) {
-               ArrayList<Double> items = loggable_items.get(i).get_items();
+               ArrayList<ArrayList<Double>> items = loggable_items.get(i).get_items();
                //  assertArrayEquals(items[i], item_names[i]);
                //  get object fileWriter from the list 
                FileWriter fileWriter = loggable_files.get(i);
                //  write to files
                for (int j=0; j < items.size(); j++) {
-                fileWriter.write(items.get(j).toString());
-                fileWriter.write(",");
-               } 
-               fileWriter.write("\n");
+                   ArrayList<Double> data = items.get(j);
+                   for (int m=0; m < data.size(); m++){
+                    fileWriter.write(data.get(m).toString());
+                    fileWriter.write(",");  
+                }
+                fileWriter.write("\n");
+               }
             }
         } catch (Exception e) {}  // making compiler happy by trying to catch stuff that could crash 
     }

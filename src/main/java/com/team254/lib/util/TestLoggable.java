@@ -2,12 +2,14 @@
 package com.team254.lib.util;
 import java.util.ArrayList;
 public class TestLoggable implements ILoggable {
-    public ArrayList<Double> get_items() {
+    public ArrayList<ArrayList<Double>> get_items() {
+        ArrayList<ArrayList<Double>> arrlist = new ArrayList<ArrayList<Double>>();
         ArrayList<Double> arr = new ArrayList<Double>();
         arr.add(1.0);
         arr.add(2.0);
         arr.add(3.0);
-        return(arr);
+        arrlist.add(arr);
+        return(arrlist);
     }
     public ArrayList<String> get_item_names() {
         ArrayList<String> ar = new ArrayList<String>();
