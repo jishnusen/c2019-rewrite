@@ -18,32 +18,37 @@ public class LoggingSystem {
     // 1.1
     //  LoggableItems object
     ArrayList<ILoggable> loggable_items = new ArrayList<ILoggable>();
-    //  creating a usingFileWriter object
-    FileWriter fileWriter = null; 
+
+    //  creating a usingFileWriter object per loggable file
+    ArrayList<FileWriter> loggable_files = new ArrayList<FileWriter>();
     void LoggingSystem() {
-        try {
-            fileWriter = new FileWriter("Test.csv");
-        } catch (Exception e) {}
     }
-    void Register(ILoggable new_loggable) {  //  start function that opens files
+    void Register(ILoggable new_loggable, String filename) {  //  start function that opens files
+        FileWriter fileWriter = null;
         try {
+            fileWriter = new FileWriter(filename);
+        } catch (Exception e) {}
+        ArrayList<String> item_names = new_loggable.get_item_names();
+        loggable_files.add(fileWriter);
+        // write names to file
+        try {
+        for (int h=0; h < item_names.size(); h++) {
+            fileWriter.write(item_names.get(h));
+            fileWriter.write(",");
+            }
+            fileWriter.write("\n");
             //  adding Loggable to Loggable_items list
             loggable_items.add(new_loggable);
         } catch (Exception e) {}
-
     }
     void Log() {  //  function that gets called and told when to log by main
         try{
             for (int i=0; i < loggable_items.size(); i++) {
                ArrayList<Double> items = loggable_items.get(i).get_items();
-               ArrayList<String> item_names = loggable_items.get(i).get_item_names();
                //  assertArrayEquals(items[i], item_names[i]);
+               //  get object fileWriter from the list 
+               FileWriter fileWriter = loggable_files.get(i);
                //  write to files
-               for (int h=0; h < item_names.size(); h++) {
-               fileWriter.write(item_names.get(h));
-               fileWriter.write(",");
-               }
-               fileWriter.write("\n");
                for (int j=0; j < items.size(); j++) {
                 fileWriter.write(items.get(j).toString());
                 fileWriter.write(",");
@@ -54,9 +59,11 @@ public class LoggingSystem {
     }
     void Close() {  //  close file
         try {
-            fileWriter.close();
+            for (int i=0; i< loggable_files.size(); i++) {
+                FileWriter fileWriter = loggable_files.get(i);
+                fileWriter.close();
+            }
         } catch (Exception e) {}
-
     }
     // 1.2
     public ArrayList<String> canCall;

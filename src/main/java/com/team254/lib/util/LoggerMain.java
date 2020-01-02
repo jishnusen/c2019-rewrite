@@ -5,7 +5,7 @@ public class LoggerMain {
       LoggingSystem LS = new LoggingSystem();
        // creating a loggable object 
        ILoggable loggable = new TestLoggable();
-       LS.Register(loggable);
+       LS.Register(loggable, "Test.csv");
        // telling it to log on a regukar basis 
        for (int i = 0; i<10; i++) {
          LS.Log();
