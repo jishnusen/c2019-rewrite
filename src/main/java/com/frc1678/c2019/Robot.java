@@ -7,8 +7,8 @@
 
 package com.frc1678.c2019;
 
-import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.auto.AutoModeExecutor;
+import com.frc1678.c2019.auto.modes.AutoModeBase;
 import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.paths.TrajectoryGenerator;
 import com.frc1678.c2019.statemachines.*;
@@ -258,7 +258,7 @@ public class Robot extends TimedRobot {
             } else if (mControlBoard.goToStow()) {
                 desired_height = SuperstructureConstants.kStowHeight;
                 desired_angle = SuperstructureConstants.kStowAngle;
-                mHatchIntake.setState(idle_hatch_intake);
+                mHatchIntake.setState(WantedAction.HOLD);
             } else if (mControlBoard.goToShip()) {
                 desired_height = cargo_preset ? SuperstructureConstants.kCargoShipForwardsHeight
                         : SuperstructureConstants.kHatchShipForwardsHeight;
@@ -309,6 +309,7 @@ public class Robot extends TimedRobot {
             }
         } else {
             mCargoIntake.forceIntakeIn();
+            mHatchIntake.setState(HatchIntakeStateMachine.WantedAction.NONE);
             mCargoIntake.setState(CargoIntake.WantedAction.NONE);
 
             if (mControlBoard.dropCrawlers()) {
@@ -389,9 +390,9 @@ public class Robot extends TimedRobot {
         Drive.getInstance().outputTelemetry();
         Wrist.getInstance().outputTelemetry();
         CargoIntake.getInstance().outputTelemetry();
-        HatchIntake.getInstance().outputTelemetry();
-        Elevator.getInstance().outputTelemetry();
-        Infrastructure.getInstance().outputTelemetry();
+        // HatchIntake.getInstance().outputTelemetry();
+        // Elevator.getInstance().outputTelemetry();
+        // Infrastructure.getInstance().outputTelemetry();
         LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();

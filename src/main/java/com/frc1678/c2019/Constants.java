@@ -28,6 +28,7 @@ public class Constants {
     public static final double kPathKX = 4.0;  // units/s per unit of error
     public static final double kPathLookaheadTime = 0.4;  // seconds to look ahead along the path for steering
     public static final double kPathMinLookaheadDistance = 24.0;  // inches
+    public static final double kPathFollowingMaxAccel = 80.0;  // inches per second ^ 2
     // PID gains for drive velocity loop 
     // Units: setpoint, error, and output are in ticks per second.
     public static final double kDriveVelocityKp = 0.9;
@@ -94,7 +95,7 @@ public class Constants {
     public static final int kElevatorRightSlaveId = 7;
     public static final int kElevatorLeftSlaveAId = 8;
     public static final int kElevatorLeftSlaveBId = 9;
-    public static final int kCrawlerId = 13; // TODO set correct number
+    public static final int kCrawlerId = 15; // TODO set correct number
     // Wrist
     public static final int kWristMasterId = 14;
     // Cargo Intake
@@ -121,6 +122,11 @@ public class Constants {
 
 
     // Limelight
+
+    public static final double kMaxTrackerDistance = 9.0;
+    public static final double kMaxGoalTrackAge = 2.5;
+    public static final double kMaxGoalTrackSmoothingTime = 0.5;
+    public static final double kCameraFrameRate = 90.0;
 
     public static final LLConstants kTopLimelightConstants = new LLConstants();
     static {

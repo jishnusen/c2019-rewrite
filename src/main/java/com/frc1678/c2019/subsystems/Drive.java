@@ -4,6 +4,7 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.frc1678.c2019.Constants;
 import com.frc1678.c2019.RobotState;
@@ -13,6 +14,7 @@ import com.frc1678.c2019.planners.DriveMotionPlanner;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.lib.control.PIDController;
 import com.team254.lib.drivers.TalonSRXChecker;
+import com.team254.lib.drivers.MotorChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
@@ -34,13 +36,15 @@ public class Drive extends Subsystem {
     private static final double DRIVE_ENCODER_PPR = 4096.;
     private static Drive mInstance = new Drive();
     // Hardware
-    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
+    private final TalonSRX mLeftMaster, mRightMaster, mLeftSlaveB;
+    private final VictorSPX mRightSlaveA, mLeftSlaveA, mRightSlaveB;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
     // Hardware states
     private PeriodicIO mPeriodicIO;
     private boolean mIsBrakeMode;
+    public final boolean isHighGear = false;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
@@ -91,8 +95,8 @@ public class Drive extends Subsystem {
         if (sensorPresent != ErrorCode.OK) {
             DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
         }
-        talon.setInverted(!left);
-        talon.setSensorPhase(true);
+        talon.setInverted(left);
+        talon.setSensorPhase(false);
         talon.enableVoltageCompensation(true);
         talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs);
@@ -108,28 +112,28 @@ public class Drive extends Subsystem {
         mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
         configureMaster(mLeftMaster, true);
 
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
-                Constants.kLeftDriveMasterId);
-        mLeftSlaveA.setInverted(false);
-
+        mLeftSlaveA = new VictorSPX(Constants.kLeftDriveSlaveAId);
+        mLeftSlaveA.follow(mLeftMaster);
+        mLeftSlaveA.setInverted(true);
+        
         mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
                 Constants.kLeftDriveMasterId);
-        mLeftSlaveB.setInverted(false);
+        mLeftSlaveB.setInverted(true);
 
         mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
         configureMaster(mRightMaster, false);
 
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
-                Constants.kRightDriveMasterId);
-        mRightSlaveA.setInverted(true);
+        mRightSlaveA = new VictorSPX(Constants.kRightDriveSlaveAId);
+        mRightSlaveA.follow(mRightMaster);
+        mRightSlaveA.setInverted(false);
 
-        mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
-                Constants.kRightDriveMasterId);
-        mRightSlaveB.setInverted(true);
+        mRightSlaveB = new VictorSPX(Constants.kRightDriveSlaveBId);
+        mRightSlaveB.follow(mRightMaster);
+        mRightSlaveB.setInverted(false);
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(mLeftSlaveA);
+        mPigeon = new PigeonIMU(mLeftSlaveB);
         mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -195,7 +199,7 @@ public class Drive extends Subsystem {
     public synchronized void updateVisionPID(boolean firstRun) {
        
         if (firstRun) {
-          throttlePID.setGoal(25.0);
+          throttlePID.setGoal(24.0);
           throttlePID2.setGoal(14.0);
           steeringPID.setGoal(0.0);
 
@@ -215,22 +219,21 @@ public class Drive extends Subsystem {
             mRightMaster.configNeutralDeadband(0.04, 0);
         }
 
-        double throttle = throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
-        double throttle2 = throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
+        double throttle = -throttlePID.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
+        double throttle2 = -throttlePID2.update(Timer.getFPGATimestamp(), mLLManager.getTargetDist());
         double steering = steeringPID.update(Timer.getFPGATimestamp(), mLLManager.getXOffset());
 
         double leftVoltage;
         double rightVoltage;
 
         if (mLLManager.getActiveLimelight() == LimelightManager.ActiveLimelight.TOP || Elevator.getInstance().getInchesOffGround() < SuperstructureConstants.kSwitchLimelightHeight) {
-            leftVoltage = (throttle + steering) / 12.0;
-            rightVoltage = (throttle - steering) / 12.0;
+            leftVoltage = (throttle - steering) / 12.0;
+            rightVoltage = (throttle + steering) / 12.0;
           } else {
-            leftVoltage = (throttle2 + steering) / 12.0;
-            rightVoltage = (throttle2 - steering) / 12.0;
+            leftVoltage = (throttle2 - steering) / 12.0;
+            rightVoltage = (throttle2 + steering) / 12.0;
   
           }
-
         
         Util.limit(rightVoltage, 1.0);
         Util.limit(leftVoltage, 1.0);
@@ -301,7 +304,7 @@ public class Drive extends Subsystem {
     public synchronized void setHeading(Rotation2d heading) {
         System.out.println("SET HEADING: " + heading.getDegrees());
 
-        mGyroOffset = heading.rotateBy(Rotation2d.fromDegrees(mPigeon.getFusedHeading()).inverse());
+        mGyroOffset = heading.rotateBy(Rotation2d.fromDegrees(-mPigeon.getFusedHeading()).inverse());
         System.out.println("Gyro offset: " + mGyroOffset.getDegrees());
 
         mPeriodicIO.gyro_heading = heading;
@@ -320,6 +323,9 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Left Drive Distance", mPeriodicIO.left_distance);
         SmartDashboard.putNumber("Right Linear Velocity", getRightLinearVelocity());
         SmartDashboard.putNumber("Left Linear Velocity", getLeftLinearVelocity());
+
+        SmartDashboard.putNumber("Left Current", mPeriodicIO.left_current);
+        SmartDashboard.putNumber("Right Current", mPeriodicIO.right_current);
 
         SmartDashboard.putNumber("x err", mPeriodicIO.error.getTranslation().x());
         SmartDashboard.putNumber("y err", mPeriodicIO.error.getTranslation().y());
@@ -440,7 +446,7 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_position_ticks = mRightMaster.getSelectedSensorPosition(0);
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
-        mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
+        mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(-mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
         double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / 4096.0) * Math.PI;
         if (deltaLeftTicks > 0.0) {
@@ -455,6 +461,9 @@ public class Drive extends Subsystem {
         } else {
             mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
         }
+
+        mPeriodicIO.left_current = mLeftMaster.getOutputCurrent();
+        mPeriodicIO.right_current = mRightMaster.getOutputCurrent();
 
         if (mCSVWriter != null) {
             mCSVWriter.add(mPeriodicIO);
@@ -478,12 +487,13 @@ public class Drive extends Subsystem {
 
     @Override
     public boolean checkSystem() {
-        boolean leftSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        boolean leftSide = TalonSRXChecker.checkMotors(this,
+        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                    private static final long serialVersionUID = 4715363468641125563L;
                     {
-                        add(new TalonSRXChecker.TalonSRXConfig("left_master", mLeftMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave1", mLeftSlaveB));
+                        add(new MotorChecker.MotorConfig<>("left_master", mLeftMaster));
+                    //    add(new MotorChecker.MotorConfig<>("left_slave", mLeftSlaveA));
+                        add(new MotorChecker.MotorConfig<>("left_slave1", mLeftSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
@@ -494,12 +504,13 @@ public class Drive extends Subsystem {
                         mRPMSupplier = () -> mLeftMaster.getSelectedSensorVelocity(0);
                     }
                 });
-        boolean rightSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+        boolean rightSide = TalonSRXChecker.checkMotors(this,
+        new ArrayList<MotorChecker.MotorConfig<TalonSRX>>() {
+                    private static final long serialVersionUID = 8979637825679409635L;
                     {
-                        add(new TalonSRXChecker.TalonSRXConfig("right_master", mRightMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
+                        add(new MotorChecker.MotorConfig<>("right_master", mRightMaster));
+                     //   add(new MotorChecker.MotorConfig<>("right_slave", mRightSlaveA));
+                     //   add(new MotorChecker.MotorConfig<>("right_slave1", mRightSlaveB));
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
@@ -538,6 +549,8 @@ public class Drive extends Subsystem {
         public int right_position_ticks;
         public double left_distance;
         public double right_distance;
+        public double left_current;
+        public double right_current;
         public int left_velocity_ticks_per_100ms;
         public int right_velocity_ticks_per_100ms;
         public Rotation2d gyro_heading = Rotation2d.identity();
