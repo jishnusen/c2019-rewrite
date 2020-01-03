@@ -33,7 +33,7 @@ public class LoggingSystem {
         }
         return mInstance; 
     }
-    void Register(ILoggable new_loggable, String filename) {  //  start function that opens files
+    public void register(ILoggable new_loggable, String filename) {  //  start function that opens files
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(filename);

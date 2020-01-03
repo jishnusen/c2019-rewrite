@@ -18,10 +18,11 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
+import com.frc1678.lib.logger.ILoggable;
 
 import java.util.ArrayList;
 
-public class Wrist extends Subsystem {
+public class Wrist extends Subsystem implements ILoggable{
     private static final int kMagicMotionSlot = 0;
     private static final int kPositionControlSlot = 1;
     private static final int kForwardSoftLimit = (int) ((190.0) * ((4096 * 2.933) / (180.0))) ; // Encoder ticks.
@@ -517,4 +518,16 @@ public class Wrist extends Subsystem {
         // OUTPUTS
         public double demand;
     }
+    public ArrayList<String> get_item_names() {
+        ArrayList<String> items = new ArrayList<String>();
+        items.add("timestamp"); 
+        return items;
+       }
+    public ArrayList<ArrayList<Double>> get_items() {
+        ArrayList<ArrayList<Double>> list = new ArrayList<ArrayList<Double>>();
+        ArrayList<Double> items = new ArrayList<Double>();
+        items.add(Timer.getFPGATimestamp());
+    list.add(items);
+    return list;
+    }    
 }

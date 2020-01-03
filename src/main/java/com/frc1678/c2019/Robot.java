@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
             //  initialization for logger
-            // mLogger.register [include all subsystems]
+            mLogger.register(mWrist, "/home/lvuser/WRIST-TEST-LOG.csv"); 
             mLogger.registerLoops(mLoggingLooper);
 
             mTrajectoryGenerator.generateTrajectories();
