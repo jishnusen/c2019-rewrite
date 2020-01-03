@@ -1,2 +1,0 @@
-/* generic functions with no actual code for other classes to implement 
-will implement the logging system*/
