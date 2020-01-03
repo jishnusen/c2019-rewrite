@@ -16,7 +16,7 @@ import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.subsystems.RobotStateEstimator;
-import com.frc1678.lib.logger.*;
+import com.frc1678.lib.logging.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
             //  initialization for logger
-            mLogger.register(mWrist, "/home/lvuser/WRIST-TEST-LOG.csv"); 
+            mLogger.register(mWrist, "/home/lvuser/WRIST-TEST-LOG.csv"); // TODO(EithneA-V) rearchitect
             mLogger.registerLoops(mLoggingLooper);
 
             mTrajectoryGenerator.generateTrajectories();
