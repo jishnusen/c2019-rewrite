@@ -9,7 +9,7 @@
             1.3.1) Writes data to logging file (specify file name for each class)
         1.4) Create LS thread and update regularly
 */
-package com.team254.lib.util;
+package com.frc1678.lib.logger;
 import com.frc1678.c2019.loops.Looper;
 import com.frc1678.c2019.loops.Loop;
 import com.frc1678.c2019.loops.ILooper;

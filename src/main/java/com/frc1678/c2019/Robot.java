@@ -16,6 +16,7 @@ import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.subsystems.RobotStateEstimator;
+import com.frc1678.lib.logger.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.DriverStation;

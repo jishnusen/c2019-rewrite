@@ -1,4 +1,4 @@
-package com.team254.lib.util; 
+package com.frc1678.lib.logger;
 
 public class LoggerMain {
     public static void main(String[] args) {

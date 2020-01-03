@@ -1,5 +1,5 @@
 /*test interface*/
-package com.team254.lib.util;
+package com.frc1678.lib.logger;
 import java.util.ArrayList;
 public class TestLoggable implements ILoggable {
     public ArrayList<ArrayList<Double>> get_items() {
