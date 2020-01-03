@@ -16,6 +16,7 @@ import com.frc1678.c2019.statemachines.HatchIntakeStateMachine.WantedAction;
 import com.frc1678.c2019.states.SuperstructureConstants;
 import com.frc1678.c2019.subsystems.*;
 import com.frc1678.c2019.subsystems.RobotStateEstimator;
+import com.frc1678.lib.logging.*;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,12 +31,15 @@ import java.util.Optional;
 public class Robot extends TimedRobot {
     private Looper mEnabledLooper = new Looper();
     private Looper mDisabledLooper = new Looper();
+    private Looper mLoggingLooper = new Looper();
     private CheesyDriveHelper mCheesyDriveHelper = new CheesyDriveHelper();
     private IControlBoard mControlBoard = ControlBoard.getInstance();
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
     private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private boolean had_cargo_ = false;
     private boolean climb_mode = false;
+
+    private LoggingSystem mLogger = LoggingSystem.getInstance();
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
             Arrays.asList(RobotStateEstimator.getInstance(), Drive.getInstance(), LimelightManager.getInstance(), Superstructure.getInstance(),
@@ -77,6 +81,9 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+            //  initialization for logger
+            mLogger.register(mWrist, "/home/lvuser/WRIST-TEST-LOG.csv"); // TODO(EithneA-V) rearchitect
+            mLogger.registerLoops(mLoggingLooper);
 
             mTrajectoryGenerator.generateTrajectories();
         } catch (Throwable t) {
@@ -91,6 +98,7 @@ public class Robot extends TimedRobot {
         try {
             CrashTracker.logDisabledInit();
             mEnabledLooper.stop();
+            mLoggingLooper.stop();
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
             }
@@ -133,6 +141,7 @@ public class Robot extends TimedRobot {
             }
 
             mEnabledLooper.start();
+            mLoggingLooper.start();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -155,6 +164,7 @@ public class Robot extends TimedRobot {
 
             RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mEnabledLooper.start();
+            mLoggingLooper.start();
 
             mDrive.setVelocity(DriveSignal.NEUTRAL, DriveSignal.NEUTRAL);
             mDrive.setOpenLoop(new DriveSignal(0.05, 0.05));
@@ -173,6 +183,7 @@ public class Robot extends TimedRobot {
 
             mDisabledLooper.stop();
             mEnabledLooper.stop();
+            mLoggingLooper.stop();
 
             mDrive.checkSystem();
             // mCargoIntake.checkSystem();
@@ -396,6 +407,7 @@ public class Robot extends TimedRobot {
         Infrastructure.getInstance().outputTelemetry();
         LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
+        mLoggingLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         // SmartDashboard.updateValues();
     }
