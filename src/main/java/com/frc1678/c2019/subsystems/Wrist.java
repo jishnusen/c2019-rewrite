@@ -18,7 +18,7 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
-import com.frc1678.lib.logger.ILoggable;
+import com.frc1678.lib.logging.ILoggable;
 
 import java.util.ArrayList;
 
@@ -518,12 +518,12 @@ public class Wrist extends Subsystem implements ILoggable{
         // OUTPUTS
         public double demand;
     }
-    public ArrayList<String> get_item_names() {
+    public ArrayList<String> getItemNames() {
         ArrayList<String> items = new ArrayList<String>();
         items.add("timestamp"); 
         return items;
        }
-    public ArrayList<ArrayList<Double>> get_items() {
+    public ArrayList<ArrayList<Double>> getItems() {
         ArrayList<ArrayList<Double>> list = new ArrayList<ArrayList<Double>>();
         ArrayList<Double> items = new ArrayList<Double>();
         items.add(Timer.getFPGATimestamp());
