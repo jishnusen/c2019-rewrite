@@ -97,6 +97,7 @@ public class Robot extends TimedRobot {
         try {
             CrashTracker.logDisabledInit();
             mEnabledLooper.stop();
+            mLoggingLooper.stop();
             if (mAutoModeExecutor != null) {
                 mAutoModeExecutor.stop();
             }
@@ -139,6 +140,7 @@ public class Robot extends TimedRobot {
             }
 
             mEnabledLooper.start();
+            mLoggingLooper.start();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -161,6 +163,7 @@ public class Robot extends TimedRobot {
 
             RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mEnabledLooper.start();
+            mLoggingLooper.start();
 
             mDrive.setVelocity(DriveSignal.NEUTRAL, DriveSignal.NEUTRAL);
             mDrive.setOpenLoop(new DriveSignal(0.05, 0.05));
@@ -179,6 +182,7 @@ public class Robot extends TimedRobot {
 
             mDisabledLooper.stop();
             mEnabledLooper.stop();
+            mLoggingLooper.stop();
 
             mDrive.checkSystem();
             // mCargoIntake.checkSystem();
@@ -401,6 +405,7 @@ public class Robot extends TimedRobot {
         // Infrastructure.getInstance().outputTelemetry();
         LimelightManager.getInstance().outputTelemetry();
         mEnabledLooper.outputToSmartDashboard();
+        mLoggingLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         // SmartDashboard.updateValues();
     }
